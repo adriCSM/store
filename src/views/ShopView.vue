@@ -462,12 +462,31 @@ nav {
 /* -----------------------------------------------------MODAL END */
 
 /* --------------------------------------------------------------------responsiv */
-@media (max-width: 1150px) {
+@media (max-width: 1000px) {
     .pesanan span {
-        font-size: 16px;
+        font-size: 14px;
+    }
+    .pesanan p {
+        font-size: 12px;
     }
     #nominal {
         font-size: 14px;
+    }
+
+    .img {
+        width: 150px;
+        height: 200px;
+    }
+    .card {
+        width: 150px;
+        height: 250px;
+    }
+    .v-card .v-card-title {
+        line-height: 12px;
+        padding-bottom: 5px;
+    }
+    .card .v-card-subtitle {
+        font-size: 11px;
     }
     .container-baru .sidebar-baru,
     .sidebar-hide {
@@ -480,7 +499,10 @@ nav {
 
 @media (max-width: 749px) {
     .pesanan span {
-        font-size: 13px;
+        font-size: 14px;
+    }
+    .pesanan p {
+        font-size: 12px;
     }
     .img {
         width: 150px;
@@ -490,15 +512,41 @@ nav {
         width: 150px;
         height: 200px;
     }
+    .v-card .v-card-title {
+        line-height: 12px;
+        padding-bottom: 5px;
+        font-size: 14px;
+    }
+    .card .v-card-subtitle {
+        font-size: 10px;
+    }
+
     .container-baru .sidebar-baru,
     .sidebar-hide {
-        width: 1000px;
+        width: 900px;
     }
     .sidebar-hide {
         width: 50px;
     }
 }
 @media (max-width: 510px) {
+    .pesanan input {
+        transform: translateY(10%);
+        font-size: 15px;
+    }
+    .pesanan p {
+        transform: translate(50px, 30px);
+        font-size: 9px;
+    }
+    .pesanan span {
+        font-size: 13px;
+        text-align: left;
+        text-overflow: ellipsis;
+    }
+    img {
+        width: 30px;
+        height: 30px;
+    }
     .img {
         width: 105px;
         height: 100px;
@@ -514,15 +562,28 @@ nav {
     .sidebar-hide {
         width: 50px;
     }
+    .v-card .v-card-title {
+        line-height: 12px;
+        padding-bottom: 5px;
+        font-size: 12px;
+    }
+    .card .v-card-subtitle {
+        font-size: 10px;
+    }
 }
 @media (max-width: 359px) {
-    .pesanan input[data-v-3a92db75] {
+    .pesanan input {
         transform: translateY(10%);
         font-size: 15px;
     }
-    .pesanan p[data-v-3a92db75] {
-        transform: translate(40px, 28px);
+    .pesanan p {
+        transform: translate(40px, 27px);
         font-size: 9px;
+    }
+    .pesanan span {
+        font-size: 12px;
+        text-align: left;
+        text-overflow: ellipsis;
     }
 
     .total v-title,
@@ -559,11 +620,6 @@ nav {
 
     sectiom .content {
         margin: 0px;
-    }
-    .pesanan span {
-        font-size: 10px;
-        text-align: left;
-        text-overflow: ellipsis;
     }
 
     .container-baru .sidebar-baru,
