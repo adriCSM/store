@@ -27,9 +27,11 @@
                                 <img :src="item.url_img" alt="a" width="40" height="40" />
 
                                 <span>{{ item.title }}</span>
-                                <p class="price">Rp{{ item.price }}</p>
+                                <p class="price">Rp{{ item.price.split('Rp').join('').split('/pcs')[0] }}</p>
 
-                                <input variant="text" type="number" class="text-center count" style="width: 40px; height: 20px" v-model="item.count" min="1" />
+                                <button class="icon-satu" @click="plus">+</button>
+                                <input variant="text" type="number" class="text-center count" style="text-align: center; width: 20px; height: 20px" v-model="item.count" min="1" />
+                                <button class="icon-dua" @click="minus">-</button>
                             </div>
                         </div>
                     </div>
@@ -56,23 +58,6 @@
                                     <v-card-text>
                                         <div class="text-subtitle">
                                             <div class="tabel d-flex align-top flex-column">
-                                                <v-table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-left">Name Produk</th>
-                                                            <th class="text-left">Harga (Rp)</th>
-                                                            <th class="text-left">unit (pcs)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody v-for="item in totalPesanan" :key="item">
-                                                        <tr>
-                                                            <td class="namaProduct">{{ item.productName }}</td>
-                                                            <td>{{ item.harga }}</td>
-                                                            <td>{{ item.count }}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </v-table>
-                                                <v-divider></v-divider>
                                                 <v-table>
                                                     <thead>
                                                         <tr>
@@ -111,8 +96,8 @@
             <section class="content">
                 <v-card v-for="product in products" :key="product" class="mt-5 text-center card" @click="tambah">
                     <v-img class="align-end text-white img" :src="require('../assets/' + product.url)" cover />
-                    <v-card-title class="title">{{ product.name }}</v-card-title>
-                    <v-card-subtitle class="subtitle">Rp{{ product.price }},00- /pcs </v-card-subtitle>
+                    <v-card-title class="title">{{ product.name.toString() }}</v-card-title>
+                    <v-card-subtitle class="subtitle">Rp{{ parseInt(product.price).toLocaleString('id-ID') }} /pcs </v-card-subtitle>
                 </v-card>
                 <!-- <div class="modal-box">hallo</div> -->
             </section>
@@ -133,14 +118,9 @@ export default {
         const totalHarga = ref(0);
 
         const products = ref([
-            { name: 'ale-ale', url: 'g1.jpg', price: '2000' },
-            { name: 'bear brend', url: 'g2.jpg', price: '11000' },
-            { name: 'milo', url: 'g3.jpg', price: '8000' },
-            { name: 'coca-cola', url: 'g4.jpg', price: '7000' },
-            { name: 'fanta', url: 'g5.jpg', price: '2000' },
-            { name: 'okky jelly drink', url: 'g6.jpg', price: '2000' },
-            { name: 'teh gelas', url: 'g7.jpg', price: '2000' },
-            { name: 'frestea', url: 'g8.jpg', price: '8000' },
+            { name: '2 in 1 Toner and Micellar Water', url: 'r1.jpg', price: '90000' },
+            { name: 'Facial Wash', url: 'r2.jpg', price: '85000' },
+            { name: 'Rejuvenating Intenstive Cream', url: 'r3.jpg', price: '90000' },
         ]);
 
         const hide = () => {
@@ -188,16 +168,16 @@ export default {
                 total.style.display = 'block';
             }
 
-            const allCard = document.querySelectorAll('.card');
+            // const allCard = document.querySelectorAll('.card');
             const card = e.currentTarget.closest('.card');
             const title = card.querySelector('.title').innerHTML;
             const url_img = card.querySelector('img').src;
-            const price = card.querySelector('.subtitle').innerHTML.split('Rp')[1].split(',00- /pcs')[0];
+            const price = card.querySelector('.subtitle').innerHTML.split('Rp')[1].split('/pcs')[0];
 
-            allCard.forEach((e) => {
-                e.classList.remove('zoom');
-            });
-            card.classList.toggle('zoom');
+            // allCard.forEach((e) => {
+            //     e.classList.remove('zoom');
+            // });
+            // card.classList.toggle('zoom');
             const cekProduct = product.value.find((a) => {
                 return a.title == title;
             });
@@ -209,7 +189,7 @@ export default {
             }
             const totals = product.value.reduce((prevalue, currVal) => {
                 let jumlah = currVal.count;
-                let harga = parseInt(currVal.price) * jumlah;
+                let harga = parseInt(currVal.price.split('.').join('')) * jumlah;
                 return prevalue + harga;
             }, 0);
 
@@ -220,7 +200,7 @@ export default {
             const pesanan = document.querySelectorAll('.pesanan');
             let jumlah_berubah = [];
             pesanan.forEach((e) => {
-                const price = e.querySelector('.price').innerHTML.split('Rp')[1];
+                const price = e.querySelector('.price').innerHTML.split('Rp')[1].split('.').join('');
                 const count = e.querySelector('.count').value;
                 jumlah_berubah.push({ harga: price, count });
             });
@@ -282,7 +262,48 @@ export default {
                 });
         };
 
-        return { showModal, products, svg, hide, product, totalHarga, pembayaran, ubah, tambah, submit, pesan, totalPesanan };
+        const plus = (e) => {
+            const parent = e.target.closest('.pesanan');
+            const titleKlik = parent.querySelector('span').innerHTML;
+            const cekProduct = product.value.find((a) => {
+                return a.title == titleKlik;
+            });
+
+            if (cekProduct) {
+                cekProduct.count++;
+            }
+            const totals = product.value.reduce((prevalue, currVal) => {
+                let jumlah = currVal.count;
+                let harga = parseInt(currVal.price.split('.').join('')) * jumlah;
+                return prevalue + harga;
+            }, 0);
+
+            totalHarga.value = totals;
+        };
+        const minus = (e) => {
+            const parent = e.target.closest('.pesanan');
+            const titleKlik = parent.querySelector('span').innerHTML;
+            // MENGUBAH PROPERTI pada OBJECT OF ARRAY
+            // mencari properti yang sesuai
+            const cekProduct = product.value.find((a) => {
+                return a.title == titleKlik;
+            });
+
+            // cekProduct berisi object yang ada pada array product
+
+            if (cekProduct) {
+                cekProduct.count--;
+            }
+            const totals = product.value.reduce((prevalue, currVal) => {
+                let jumlah = currVal.count;
+                let harga = parseInt(currVal.price.split('.').join('')) * jumlah;
+                return prevalue + harga;
+            }, 0);
+
+            totalHarga.value = totals;
+        };
+
+        return { plus, minus, showModal, products, svg, hide, product, totalHarga, pembayaran, ubah, tambah, submit, pesan, totalPesanan };
     },
 };
 </script>
@@ -356,9 +377,39 @@ nav {
 }
 .pesanan input {
     position: absolute;
-    right: 0;
+    right: 25px;
     align-items: center;
     transform: translateY(50%);
+    min-width: 40px;
+}
+
+.pesanan input::-webkit-inner-spin-button,
+.pesanan input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.icon-satu,
+.icon-dua {
+    z-index: 1;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #38bdf8;
+    right: 0;
+    top: 0;
+    transform: translate(-5px, 100%);
+    display: flex;
+    margin: auto;
+    align-items: self-end;
+    justify-content: center;
+    border-radius: 20px;
+    color: white;
+    font-weight: bolder;
+}
+
+.icon-dua {
+    transform: translate(-65px, 100%);
 }
 
 .nominal {
@@ -433,17 +484,12 @@ nav {
     box-shadow: -2px 2px 2px rgb(0, 0, 0, 0.5);
     transition: 0.5s;
 }
-.card:hover {
+.card:active {
     box-shadow: -10px 10px 10px rgb(0, 0, 0, 0.5);
     cursor: pointer;
 }
 
 /* ---------------------------------------content End*/
-
-.zoom {
-    z-index: 1;
-    transform: scaley(1.05);
-}
 
 /* -----------------------------------------------------MODAL  */
 .modal-box {
@@ -499,7 +545,12 @@ nav {
 
 @media (max-width: 749px) {
     .pesanan span {
-        font-size: 14px;
+        width: 55%;
+        font-size: 13px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .pesanan p {
         font-size: 12px;
@@ -533,20 +584,32 @@ nav {
     .pesanan input {
         transform: translateY(10%);
         font-size: 15px;
+        min-width: 30px;
     }
     .pesanan p {
         transform: translate(50px, 30px);
         font-size: 9px;
     }
     .pesanan span {
+        width: 55%;
         font-size: 13px;
         text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
         text-overflow: ellipsis;
     }
     img {
         width: 30px;
         height: 30px;
     }
+    .icon-satu,
+    .icon-dua {
+        transform: translate(-5px, 65%);
+    }
+    .icon-dua {
+        transform: translate(-55px, 65%);
+    }
+
     .img {
         width: 105px;
         height: 100px;
@@ -573,8 +636,17 @@ nav {
 }
 @media (max-width: 359px) {
     .pesanan input {
-        transform: translateY(10%);
-        font-size: 15px;
+        right: 20px;
+        font-size: 14px;
+        color: green;
+        min-width: 15px;
+    }
+    .icon-satu,
+    .icon-dua {
+        transform: translate(0px, 65%);
+    }
+    .icon-dua {
+        transform: translate(-40px, 65%);
     }
     .pesanan p {
         transform: translate(40px, 27px);
@@ -582,7 +654,10 @@ nav {
     }
     .pesanan span {
         font-size: 12px;
+        width: 45%;
+        white-space: nowrap;
         text-align: left;
+        overflow: hidden;
         text-overflow: ellipsis;
     }
 
@@ -603,19 +678,20 @@ nav {
         transform: translate(30px, 20px);
     }
     .img {
-        width: 110px;
-        height: 100px;
+        width: 100%;
+        height: 80%;
     }
     .card {
-        width: 110px;
-        height: 150px;
+        width: 250px;
+        height: 300px;
     }
     .v-card .v-card-title {
         line-height: 12px;
         padding-bottom: 5px;
+        font-size: 14px;
     }
     .card .v-card-subtitle {
-        font-size: 10px;
+        font-size: 16px;
     }
 
     sectiom .content {
