@@ -1,34 +1,52 @@
 <script>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import router from '@/router';
+import jwt_decode from 'jwt-decode';
+import getToken from '../function/refereshToken';
+// import router from '@/router';
 export default {
     setup() {
         const pesanan = ref([]);
+        const decoded = ref();
+        const Authorization = ref(false);
 
-        axios
-            .get('/data')
-            .then((items) => {
-                const transaksi = items.data.data.pesanan;
-                transaksi.map((e) => {
-                    pesanan.value.push(e);
-                });
-            })
-            .catch((err) => {
-                console.log(err.message);
-            });
+        onMounted(async () => {
+            try {
+                const data = await getToken();
+                decoded.value = jwt_decode(data.token);
+
+                await axios
+                    .get('/data', {
+                        headers: {
+                            Authorization: `Bearer ${data.token}`,
+                        },
+                    })
+                    .then((items) => {
+                        Authorization.value = true;
+                        const transaksi = items.data.data.pesanan;
+                        transaksi.map((e) => {
+                            pesanan.value.push(e);
+                        });
+                    });
+            } catch (err) {
+                router.push({ name: 'login' });
+            }
+        });
 
         return {
             pesanan,
+            Authorization,
         };
     },
 };
 </script>
 <template>
-    <div>
+    <div v-if="Authorization">
         <!-- ------------------ NAV -->
         <nav class="navbar navbar-expand-lg navbar-transaksi">
             <div class="container">
-                <router-link class="navbar-brand" to="/">Home</router-link>
+                <router-link class="navbar-brand" to="home">Home</router-link>
                 <div class="collapse navbar-collapse" id="navbarNav"></div>
             </div>
         </nav>
@@ -43,7 +61,7 @@ export default {
                     <v-table>
                         <thead>
                             <tr>
-                                <th class="text-left">Name Produk</th>
+                                <th class="text-left">Produk</th>
                                 <th class="text-left">Harga</th>
                                 <th class="text-center">unit/pcs</th>
                             </tr>
@@ -83,9 +101,7 @@ export default {
 </template>
 <style scope>
 .navbar-transaksi {
-    backdrop-filter: blur(10px);
-    background-color: #ffffff30;
-    -webkit-backdrop-filter: blur(25px);
+    background-color: #006d5b;
 }
 /* position fixed */
 

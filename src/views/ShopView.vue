@@ -1,25 +1,33 @@
 <template>
-    <div>
+    <div v-if="Authorization">
         <!-- ------------------ NAV -->
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <router-link class="navbar-brand" to="/">Home</router-link>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <v-tabs v-model="tab" align-tabs="end" class="ms-auto text-capitalize">
-                        <router-link class="text-h6" :to="{ name: 'minuman' }"> <v-tab :value="1">Minuman</v-tab> </router-link>
-                    </v-tabs>
-                </div>
-            </div>
-        </nav>
+        <v-app-bar color="teal">
+            <template>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+
+            <v-app-bar-title><v-img src="../assets/logoam2.png" height="50" width="100"></v-img></v-app-bar-title>
+
+            <v-spacer></v-spacer>
+
+            <router-link to="keranjang" class="me-5">
+                <v-btn icon>
+                    <v-badge content="2" color="error">
+                        <v-icon>mdi-cart</v-icon>
+                    </v-badge>
+                </v-btn>
+            </router-link>
+            <v-btn icon @click.stop="drawer = !drawer">
+                <v-avatar :image="decoded.picture" size="45"></v-avatar>
+            </v-btn>
+        </v-app-bar>
         <!-- ------------------ NAV END-->
 
         <!-- ------------------ SIDEBAR & CONTENT -->
+
         <div class="container-baru">
             <aside class="sidebar-hide">
-                <span @click="hide" class="exit"><img :src="require('../assets/iconmonstr-line-three-horizontal-lined.svg')" alt="" style="width: 20px" /></span>
+                <v-app-bar-nav-icon @click="hide"></v-app-bar-nav-icon>
                 <div class="main-sidebar" v-if="product !== null">
                     <div v-for="item in product" :key="item">
                         <div v-if="item.count != 0" class="pesanan" @change="ubah">
@@ -101,21 +109,44 @@
                 </v-card>
                 <!-- <div class="modal-box">hallo</div> -->
             </section>
+
+            <v-navigation-drawer v-model="drawer" temporary location="top" color="teal" theme="light">
+                <template v-slot:prepend>
+                    <v-list-item lines="two" :prepend-avatar="decoded.picture" :title="decoded.fullName" subtitle="Logged in"></v-list-item>
+                </template>
+
+                <v-divider></v-divider>
+
+                <v-list density="compact" nav>
+                    <v-list-item prepend-icon="mdi-account" title="Profile" value="profile"></v-list-item>
+                    <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout" @click="logout"></v-list-item>
+                </v-list>
+            </v-navigation-drawer>
         </div>
+
         <!-- ------------------ SIDEBAR & CONTENT -->
     </div>
 </template>
 ########################################################################################################################
 <script scope>
 import { onMounted, ref } from 'vue';
+import getToken from '../function/refereshToken';
 import router from '@/router';
 import axios from 'axios';
 import AutoNumeric from 'autonumeric';
+import jwt_decode from 'jwt-decode';
 export default {
+    data() {
+        return {
+            drawer: null,
+        };
+    },
     setup() {
         const svg = ref(require('../assets/icons8-double-left-100.png'));
         const product = ref([]);
         const totalHarga = ref(0);
+        const token = ref();
+        const Authorization = ref(false);
 
         const products = ref([
             { name: '2 in 1 Toner and Micellar Water', url: 'r1.jpg', price: '90000' },
@@ -129,16 +160,13 @@ export default {
             const card = document.querySelector('.main-sidebar');
             const nominal = document.querySelector('.nominal');
             const total = document.querySelector('.total');
-            const exit = document.querySelector('.exit img');
 
             if (sidebar) {
-                exit.setAttribute('src', require('../assets/iconmonstr-line-three-horizontal-lined.svg'));
                 sidebar.setAttribute('class', 'sidebar-hide');
                 card.style.display = 'none';
                 nominal.style.display = 'none';
                 total.style.display = 'none';
             } else {
-                exit.setAttribute('src', require('../assets/icons8-double-left-100.png'));
                 hide.setAttribute('class', 'sidebar-baru');
                 card.style.display = 'block';
                 nominal.style.display = 'block';
@@ -152,16 +180,13 @@ export default {
             const cards = document.querySelector('.main-sidebar');
             const nominal = document.querySelector('.nominal');
             const total = document.querySelector('.total');
-            const exit = document.querySelector('.exit img');
 
             if (sidebar) {
-                exit.setAttribute('src', require('../assets/icons8-double-left-100.png'));
                 sidebar.setAttribute('class', 'sidebar-baru');
                 cards.style.display = 'block';
                 nominal.style.display = 'block';
                 total.style.display = 'block';
             } else {
-                exit.setAttribute('src', require('../assets/icons8-double-left-100.png'));
                 hide.setAttribute('class', 'sidebar-baru');
                 cards.style.display = 'block';
                 nominal.style.display = 'block';
@@ -174,10 +199,6 @@ export default {
             const url_img = card.querySelector('img').src;
             const price = card.querySelector('.subtitle').innerHTML.split('Rp')[1].split('/pcs')[0];
 
-            // allCard.forEach((e) => {
-            //     e.classList.remove('zoom');
-            // });
-            // card.classList.toggle('zoom');
             const cekProduct = product.value.find((a) => {
                 return a.title == title;
             });
@@ -212,8 +233,22 @@ export default {
             totalHarga.value = total;
         };
 
+        // axios.interceptors.request.use(async())
+
+        const decoded = ref();
         const pembayaran = ref(0);
-        onMounted(() => {
+        onMounted(async () => {
+            getToken()
+                .then((res) => {
+                    console.log(res);
+                    token.value = res.token;
+                    decoded.value = jwt_decode(token.value).decoded;
+                    Authorization.value = true;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+
             const inputElement = document.getElementById('bayar');
             if (inputElement) {
                 new AutoNumeric(inputElement, {
@@ -247,19 +282,38 @@ export default {
         };
 
         const submit = async () => {
+            const response = await getToken();
+            token.value = response.token;
+
             const transaksi = { totalHarga: totalHarga.value, pembayaran: parseInt(pembayaran.value.split('.').join('')), kembalian: pembayaran.value.split('.').join('') - totalHarga.value };
             const allTransaksi = { pesanan: totalPesanan.value, transaksi };
-            console.log(allTransaksi);
-            await axios
-                .post('/data/pesanan', {
-                    arrayProduct: allTransaksi,
-                })
-                .then((items) => {
-                    router.push({ name: 'transaksi', params: { message: items.data.message } });
-                })
-                .catch((err) => {
-                    console.log(err.message);
+            try {
+                await axios
+                    .post(
+                        '/data/pesanan',
+                        {
+                            arrayProduct: allTransaksi,
+                        },
+                        {
+                            headers: {
+                                Authorization: 'Bearer ' + token.value,
+                            },
+                        },
+                    )
+                    .then((items) => {
+                        router.push({ name: 'keranjang', params: { message: items.data.message } });
+                    })
+                    .catch((err) => {
+                        console.log(err.message);
+                    });
+
+                await axios.post('/wa/costumer', {
+                    no: decoded.value.phoneNumber,
+                    name: decoded.value.fullName,
                 });
+            } catch (err) {
+                console.log(err.message);
+            }
         };
 
         const plus = (e) => {
@@ -303,7 +357,20 @@ export default {
             totalHarga.value = totals;
         };
 
-        return { plus, minus, showModal, products, svg, hide, product, totalHarga, pembayaran, ubah, tambah, submit, pesan, totalPesanan };
+        const logout = async () => {
+            await axios
+                .delete('/logout', {
+                    withCredentials: true,
+                })
+                .then(() => {
+                    router.push({ name: 'login' });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        };
+
+        return { decoded, Authorization, logout, plus, minus, showModal, products, svg, hide, product, totalHarga, pembayaran, ubah, tambah, submit, pesan, totalPesanan };
     },
 };
 </script>
@@ -329,7 +396,7 @@ nav {
     background-color: #ffffff30;
     -webkit-backdrop-filter: blur(25px);
     height: 100vh;
-    width: 600px;
+    width: 400px;
     padding: 10px;
     box-sizing: border-box;
     text-align: end;
@@ -491,22 +558,6 @@ nav {
 
 /* ---------------------------------------content End*/
 
-/* -----------------------------------------------------MODAL  */
-.modal-box {
-    /* width: 40vw;
-    height: 80vh;
-    background-color: grey;
-    position: absolute;
-    left: 0;
-    top: 0;
-    justify-content: center;
-    transform: translate(70%, 10%);
-    border-radius: 10px;
-    background-color: #1d212b; */
-}
-
-/* -----------------------------------------------------MODAL END */
-
 /* --------------------------------------------------------------------responsiv */
 @media (max-width: 1000px) {
     .pesanan span {
@@ -536,7 +587,7 @@ nav {
     }
     .container-baru .sidebar-baru,
     .sidebar-hide {
-        width: 500px;
+        width: 370px;
     }
     .sidebar-hide {
         width: 50px;
@@ -708,10 +759,10 @@ nav {
 }
 /* --------------------------------------------------------------------responsiv End*/
 
-.router-link-active {
+/* .router-link-active {
     background-color: #006994;
     border-radius: 10px;
-}
+} */
 .router-link:hover {
     color: white;
 }
