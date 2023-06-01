@@ -7,7 +7,16 @@
 
             <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
-            <v-text-field v-model="email" :rules="emailRules" density="compact" type="email" placeholder="Email address" prepend-inner-icon="mdi-email-outline" variant="outlined"></v-text-field>
+            <v-text-field
+                v-model="email"
+                :rules="emailRules"
+                density="compact"
+                type="email"
+                placeholder="Email address"
+                prepend-inner-icon="mdi-email-outline"
+                variant="outlined"
+                @keyup.enter="login()"
+            ></v-text-field>
 
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
                 Password
@@ -23,6 +32,7 @@
                 variant="outlined"
                 @click:append-inner="visible = !visible"
                 v-model="password"
+                @keyup.enter="login()"
             ></v-text-field>
 
             <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="login"> Log In </v-btn>
@@ -78,7 +88,6 @@ export default {
         }
 
         const login = async () => {
-            console.log(email.value);
             await axios
                 .post(
                     '/auth/login',
@@ -97,8 +106,9 @@ export default {
                         setTimeout(() => {
                             error.value = '';
                         }, 3000);
+                    } else {
+                        console.log(err);
                     }
-                    error.value = err.message;
                 });
         };
 
