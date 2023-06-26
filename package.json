@@ -12,7 +12,6 @@
     "autonumeric": "^4.9.0",
     "axios": "^1.4.0",
     "core-js": "^3.8.3",
-    "dotenv": "^16.0.3",
     "jwt-decode": "^3.1.2",
     "roboto-fontface": "*",
     "vue": "^3.2.13",

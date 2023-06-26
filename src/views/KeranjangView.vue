@@ -40,7 +40,7 @@ export default {
         });
 
         productsCart.value = response.data.data.products.sort((productA, productB) => {
-          return productA.name.localeCompare(productB.name);
+          return productA.product_id.name.localeCompare(productB.product_id.name);
         });
       } catch (err) {
         if (err.response.status == 401) {
@@ -55,7 +55,7 @@ export default {
     const checkbox = () => {
       let totalProductPrice = 0;
       selected.value.map((product) => {
-        totalProductPrice += parseInt(product.price) * product.count;
+        totalProductPrice += parseInt(product.product_id.price) * product.count;
       });
       totalProductsPrice.value = totalProductPrice;
     };
@@ -120,7 +120,7 @@ export default {
         productsCartDelete.map(async (product) => {
           await refreshAccessToken();
           await axios
-            .delete('/carts/' + product.id, {
+            .delete('/carts/' + product.product_id._id, {
               headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
               },
@@ -143,7 +143,7 @@ export default {
     const min = (product) => {
       if (product.count > 0) {
         product.count--;
-        change(product.id, product.count);
+        change(product.product_id._id, product.count);
         checkbox();
       }
       if (product.count == 0) {
@@ -153,7 +153,7 @@ export default {
     const plus = (product) => {
       if (product.count < 99) {
         product.count++;
-        change(product.id, product.count);
+        change(product.product_id._id, product.count);
         checkbox();
       }
     };
@@ -182,8 +182,8 @@ export default {
 <template>
   <v-card max-width="448" class="mx-auto" color="grey-lighten-3">
     <v-layout>
-      <v-main>
-        <v-container fluid class="overflow-y-auto bg-white pe-1">
+      <v-main class="d-flex flex-column">
+        <v-container fluid class="overflow-y-auto bg-white">
           <v-row
             dense
             class="bg-white d-flex align-center"
@@ -201,15 +201,15 @@ export default {
               </v-checkbox>
             </v-col>
             <v-col cols="2">
-              <v-img :src="product.image"></v-img>
+              <v-img :src="product.product_id.image"></v-img>
             </v-col>
             <v-col cols="6" class="ps-5">
               <v-row>
-                <v-title>{{ product.name }}</v-title>
+                <v-title>{{ product.product_id.name }}</v-title>
               </v-row>
               <v-row>
                 <v-subtitle class="text-teal"
-                  >Rp.{{ parseInt(product.price).toLocaleString('id-ID') }}</v-subtitle
+                  >Rp.{{ parseInt(product.product_id.price).toLocaleString('id-ID') }}</v-subtitle
                 >
               </v-row>
             </v-col>
@@ -229,8 +229,8 @@ export default {
                 min="0"
                 max="99"
                 v-model="product.count"
-                @keyup="changeCount(product.id, product.count)"
-                @change="onChangeCount(product.id, product.count)"
+                @keyup="changeCount(product.product_id._id, product.count)"
+                @change="onChangeCount(product.product_id._id, product.count)"
                 variant="solo-filled"
               ></v-text-field>
             </v-col>
@@ -246,19 +246,18 @@ export default {
             <v-divider class="ma-0 mb-2"></v-divider>
           </v-row>
         </v-container>
-        <v-container class="bg-white">
-          <v-row>
-            <v-col cols="6">
+        <v-container class="bg-white mt-auto">
+          <v-row class="d-flex align-center">
+            <v-col cols="auto" class="ps-0">
               <v-title class="font-weight-bold">Total harga :</v-title>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="auto">
               <v-title class="font-weight-bold"
                 >Rp{{ totalProductsPrice.toLocaleString('id-ID') }}
               </v-title>
             </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
+
+            <v-col cols="2" class="ms-auto me-3 pa-2">
               <v-btn color="teal" @click="snackbar = true">Pesan</v-btn>
             </v-col>
           </v-row>
@@ -297,7 +296,7 @@ export default {
           <v-btn
             color="red"
             variant="text"
-            @keydown.enter="deleteProductInCart(true)"
+            @keyup.enter="deleteProductInCart(true)"
             @click="deleteProductInCart(true)"
           >
             Yes
@@ -310,8 +309,8 @@ export default {
 </template>
 <style scope>
 .v-container--fluid {
-  max-height: 78.2vh;
-  min-height: 78.2vh;
+  max-height: 85.3vh;
+  min-height: 85.3vh;
 }
 .custom-input input[type='number']::-webkit-inner-spin-button,
 .custom-input input[type='number']::-webkit-outer-spin-button {
@@ -325,7 +324,6 @@ export default {
 }
 
 .checkbox {
-  position: absolute;
   left: 0;
   transform: translateY(-25px);
 }
@@ -342,8 +340,8 @@ export default {
     width: 100vw;
   }
   .v-container--fluid {
-    max-height: 74vh;
-    min-height: 74vh;
+    max-height: 84.4vh;
+    min-height: 84.4vh;
   }
 }
 /* ===================================responsiv End*/

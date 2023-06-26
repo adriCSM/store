@@ -4,14 +4,12 @@
       <v-app-bar color="teal">
         <v-app-bar-title>
           <v-text-field
-            :items="items"
-            auto-select-first
+            @keyup.prevent="searchProduct"
+            v-model="query"
             class="flex-full-width pt-5"
             density="comfortable"
-            item-props
-            menu-icon=""
-            placeholder="Search item"
-            append-inner-icon="mdi-magnify"
+            placeholder="Search products"
+            prepend-inner-icon="mdi-magnify"
             rounded
             theme="light"
             variant="solo"
@@ -45,7 +43,12 @@
               ></v-carousel-item>
             </v-carousel>
           </v-row>
-          <v-row dense>
+          <v-row v-if="!products.length" dense>
+            <v-col>
+              <h6 class="text-center">Tidak ada product dengan nama "{{ query }}""</h6>
+            </v-col>
+          </v-row>
+          <v-row v-else dense>
             <v-col cols="4" v-for="product in products" :key="product">
               <v-dialog width="auto">
                 <template v-slot:activator="{ props }">
@@ -89,7 +92,7 @@
                       ></v-text-field>
                       <v-btn
                         variant="text"
-                        @click="addToCart(product.id), (isActive.value = false)"
+                        @click="addToCart(product._id), (isActive.value = false)"
                         color="green"
                       >
                         <v-icon size="30">mdi-cart-plus</v-icon>
@@ -142,19 +145,38 @@ export default {
     const snackbar = ref(false);
     const products = ref([]);
     const count = ref(1);
+    const query = ref(null);
 
     const contentValue = ref(0);
+
+    const error = (err) => {
+      if (err.response.status == 401) {
+        router.push({ name: 'login' });
+      }
+      console.log(err);
+    };
 
     const getProducts = async () => {
       try {
         await axios.get('/products').then((response) => {
-          products.value = response.data.data.products;
+          products.value = response.data.data.products.sort((productA, productB) => {
+            return productA.name.localeCompare(productB.name);
+          });
         });
       } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
+        error(err);
+      }
+    };
+
+    const searchProduct = () => {
+      try {
+        axios.get(`/products/?productName=${query.value}`).then((response) => {
+          products.value = response.data.data.products.sort((productA, productB) => {
+            return productA.name.localeCompare(productB.name);
+          });
+        });
+      } catch (err) {
+        error(err);
       }
     };
 
@@ -174,10 +196,7 @@ export default {
             });
         }
       } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
+        error(err);
       }
     };
 
@@ -199,10 +218,7 @@ export default {
         count.value = 1;
         getProductsCart();
       } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
+        error(err);
       }
     };
 
@@ -219,10 +235,7 @@ export default {
             contentValue.value = response.data.data.products.length;
           });
       } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
+        error(err);
       }
     };
 
@@ -246,7 +259,7 @@ export default {
       getProductsCart();
     });
 
-    return { products, addToCart, contentValue, snackbar, count };
+    return { products, addToCart, contentValue, snackbar, count, searchProduct, query };
   },
 };
 </script>

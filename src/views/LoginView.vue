@@ -31,10 +31,10 @@
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field
-        v-model="username"
-        :rules="usernameRules"
+        v-model="email"
+        :rules="emailRules"
         density="compact"
-        type="email"
+        type="text"
         placeholder="Username"
         prepend-inner-icon="mdi-account-outline"
         variant="outlined"
@@ -100,11 +100,11 @@ export default {
   name: 'HelloWorld',
   data: () => ({
     visible: false,
-    usernameRules: [
+    emailRules: [
       (value) => {
         if (value) return true;
 
-        return 'E-mail is required.';
+        return 'Username is required.';
       },
       (value) => {
         if (/^\S+$/.test(value)) return true;
@@ -114,7 +114,7 @@ export default {
     ],
   }),
   setup() {
-    const username = ref();
+    const email = ref();
     const password = ref();
     const error = ref();
     const success = ref();
@@ -130,7 +130,7 @@ export default {
         .post(
           '/auth',
           {
-            username: username.value,
+            email: email.value,
             password: password.value,
           },
           { withCredentials: true },
@@ -154,7 +154,7 @@ export default {
         });
     };
 
-    return { username, password, login, error, success };
+    return { email, password, login, error, success };
   },
 };
 </script>
