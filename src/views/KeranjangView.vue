@@ -1,56 +1,35 @@
 <script>
-import { onMounted, ref } from 'vue';
-import axios from 'axios';
-import router from '@/router';
-import jwt_decode from 'jwt-decode';
+import { computed, onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+
 export default {
   setup() {
+    const store = useStore();
     const snackbar = ref(false);
-    const productsCart = ref([]);
-    const selected = ref([]);
     const deleteProduct = ref(false);
-
-    const refreshAccessToken = async () => {
-      try {
-        const accessToken = localStorage.getItem('accessToken');
-        const tokenDecoded = jwt_decode(accessToken);
-        const currentTime = new Date().getTime();
-        if (currentTime > (tokenDecoded.iat + 14) * 1000) {
-          const response = await axios.put('/auth', {
-            refreshToken: localStorage.getItem('refreshToken'),
-          });
-          const accessToken = response.data.data.accessToken;
-          localStorage.setItem('accessToken', accessToken);
-        }
-      } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
-      }
-    };
+    const totalProductsPrice = ref(0);
+    const selected = ref([]);
 
     const getProductsCart = async () => {
-      try {
-        await refreshAccessToken();
-        const response = await axios.get('/carts/products', {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-          },
-        });
+      await store.dispatch('productsStore/getProductsCart');
+    };
 
-        productsCart.value = response.data.data.products.sort((productA, productB) => {
-          return productA.product_id.name.localeCompare(productB.product_id.name);
-        });
-      } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
+    const changeCountProduct = async (productId, count) => {
+      if (count == 0) {
+        deleteProduct.value = true;
+      } else {
+        await store.dispatch('productsStore/changeCountProduct', { productId, count });
       }
     };
 
-    const totalProductsPrice = ref(0);
+    onMounted(async () => {
+      await getProductsCart();
+    });
+
+    const productsCart = computed(() => {
+      const products = store.state.productsStore.cartProducts;
+      return products;
+    });
 
     const checkbox = () => {
       let totalProductPrice = 0;
@@ -60,49 +39,14 @@ export default {
       totalProductsPrice.value = totalProductPrice;
     };
 
-    const change = async (productId, count) => {
-      if (count == 0) {
-        deleteProduct.value = true;
-      } else {
-        deleteProduct.value = false;
-        await refreshAccessToken();
-        await axios.put(
-          '/carts',
-          {
-            id: productId,
-            count,
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-            },
-          },
-        );
-      }
-    };
-
     const onChangeCount = async (productId, count) => {
-      try {
-        await change(productId, count);
-        checkbox();
-      } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
-      }
+      await changeCountProduct(productId, count);
+      checkbox();
     };
 
     const changeCount = async (productId, count) => {
-      try {
-        await change(productId, count);
-        checkbox();
-      } catch (err) {
-        if (err.response.status == 401) {
-          router.push({ name: 'login' });
-        }
-        console.log(err);
-      }
+      await changeCountProduct(productId, count);
+      checkbox();
     };
 
     const deleteProductInCart = (boolean) => {
@@ -118,24 +62,8 @@ export default {
           return e.count == 0;
         });
         productsCartDelete.map(async (product) => {
-          await refreshAccessToken();
-          await axios
-            .delete('/carts/' + product.product_id._id, {
-              headers: {
-                Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-              },
-            })
-            .catch((err) => {
-              if (err.response.status == 401) {
-                router.push({ name: 'login' });
-              }
-              console.log(err);
-            });
+          await store.dispatch('productsStore/deleteProductsCart', product.product_id._id);
         });
-        const newProductsCart = productsCart.value.filter((e) => {
-          return e.count != 0;
-        });
-        productsCart.value = newProductsCart;
       }
       deleteProduct.value = false;
     };
@@ -143,7 +71,7 @@ export default {
     const min = (product) => {
       if (product.count > 0) {
         product.count--;
-        change(product.product_id._id, product.count);
+        changeCountProduct(product.product_id._id, product.count);
         checkbox();
       }
       if (product.count == 0) {
@@ -153,19 +81,15 @@ export default {
     const plus = (product) => {
       if (product.count < 99) {
         product.count++;
-        change(product.product_id._id, product.count);
+        changeCountProduct(product.product_id._id, product.count);
         checkbox();
       }
     };
 
-    onMounted(() => {
-      refreshAccessToken();
-      getProductsCart();
-    });
-
     return {
       productsCart,
       snackbar,
+      changeCountProduct,
       changeCount,
       onChangeCount,
       selected,
@@ -252,8 +176,9 @@ export default {
               <v-title class="font-weight-bold">Total harga :</v-title>
             </v-col>
             <v-col cols="auto">
-              <v-title class="font-weight-bold"
-                >Rp{{ totalProductsPrice.toLocaleString('id-ID') }}
+              <v-title class="font-weight-bold text-teal"
+                >Rp
+                {{ totalProductsPrice.toLocaleString('id-ID') }}
               </v-title>
             </v-col>
 
@@ -296,12 +221,14 @@ export default {
           <v-btn
             color="red"
             variant="text"
-            @keyup.enter="deleteProductInCart(true)"
-            @click="deleteProductInCart(true)"
+            @keyup.enter.prevent="deleteProductInCart(true)"
+            @click.prevent="deleteProductInCart(true)"
           >
             Yes
           </v-btn>
-          <v-btn color="indigo" variant="text" @click="deleteProductInCart(false)"> No </v-btn>
+          <v-btn color="indigo" variant="text" @click.prevent="deleteProductInCart(false)">
+            No
+          </v-btn>
         </template>
       </v-snackbar>
     </v-layout>

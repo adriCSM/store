@@ -1,91 +1,88 @@
 <template>
-  <div class="py-4 mx-2">
-    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
-      <v-img
-        class="mx-auto mb-10"
-        max-width="228"
-        max-height="70px"
-        src="../assets/logoam2.png"
-      ></v-img>
-      <v-alert
-        v-if="error"
-        variant="outlined"
-        color="error"
-        elevation="2"
-        prominent
-        border="start"
-        class="message text-red d-flex text-capitalize justify-center"
-        >{{ error }}</v-alert
-      >
-      <v-alert
-        v-if="success"
-        variant="outlined"
-        color="success"
-        elevation="2"
-        prominent
-        border="start"
-        class="message text-red d-flex text-capitalize justify-center"
-        >{{ success }}</v-alert
-      >
-
-      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
-
+  <div
+    class="d-flex min-vh-100 align-items-center"
+    style="
+      background-image: url('https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+    "
+  >
+    <v-card class="mx-auto pa-3 overflow-visible" elevation="20" min-width="350" rounded="lg">
+      <v-card class="mx-auto bg-success mt-0 rounded-lg align-end" style="top: -40px" elevation="8">
+        <v-img class="mx-auto my-8" max-width="120" max-height="70px" src="../assets/logoam2.png">
+        </v-img>
+        <v-alert
+          v-if="error"
+          variant="outlined"
+          color="error"
+          elevation="2"
+          prominent
+          border="start"
+          class="message text-red d-flex text-capitalize justify-center"
+        >
+          {{ error }}
+        </v-alert>
+        <v-alert
+          v-if="success"
+          variant="outlined"
+          color="success"
+          elevation="2"
+          prominent
+          border="start"
+          class="message text-red d-flex text-capitalize justify-center"
+        >
+          {{ success }}
+        </v-alert>
+      </v-card>
+      <label for="email" class="text-subtitle-2 text-medium-emphasis">Email</label>
       <v-text-field
-        v-model="email"
+        id="email"
+        name="email"
+        color="success"
+        v-model="user.email"
         :rules="emailRules"
         density="compact"
-        type="text"
-        placeholder="Username"
-        prepend-inner-icon="mdi-account-outline"
+        type="email"
+        prepend-inner-icon="mdi-email-outline"
         variant="outlined"
         @keyup.enter="login()"
       ></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-        Password
+        <label for="password"> Password </label>
         <router-link
-          class="text-caption text-decoration-none text-blue"
+          class="text-caption font-weight-light text-success"
           to="password"
           rel="noopener noreferrer"
           target="_self"
         >
-          Forgot login password?</router-link
+          Forgot password?</router-link
         >
       </div>
 
       <v-text-field
+        id="password"
         :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
         :type="visible ? 'text' : 'password'"
         density="compact"
-        placeholder="Enter your password"
         prepend-inner-icon="mdi-lock-outline"
+        color-icon="red"
         variant="outlined"
+        color="success"
         @click:append-inner="visible = !visible"
-        v-model="password"
+        v-model="user.password"
         @keyup.enter="login()"
       ></v-text-field>
 
-      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="login">
-        Log In
+      <v-btn block class="mb-8" color="success" @click="login">
+        <span class="pe-3"> Log In </span>
+        <v-progress-circular :width="6" :size="30" color="white" indeterminate v-show="show">
+        </v-progress-circular>
       </v-btn>
-      <div class="login" v-if="!email_verified">
-        <div
-          id="g_id_onload"
-          data-auto_prompt="false"
-          data-client_id="744997405077-43ing8cg842ad6onbuocen992qheo5mn.apps.googleusercontent.com"
-          data-callback="handleCredentialResponse"
-          data-login_uri="http://localhost:8080/"
-        ></div>
-        <div class="g_id_signin" data-type="standard" data-text="sign_in_with"></div>
-      </div>
 
-      <v-card-text class="text-center">
-        <router-link
-          class="text-blue text-decoration-none"
-          :to="{ name: 'register' }"
-          rel="noopener noreferrer"
-        >
-          Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+      <v-card-text class="text-center" style="font-size: 14px">
+        <span color="black " class="font-weight-light">Don't have an account ?</span>
+        <router-link class="text-success" :to="{ name: 'register' }" rel="noopener noreferrer">
+          Sign Up
         </router-link>
       </v-card-text>
     </v-card>
@@ -94,8 +91,10 @@
 
 <script>
 import { ref } from 'vue';
-import axios from 'axios';
+import { useStore } from 'vuex';
 import router from '@/router';
+// import router from '@/router';
+
 export default {
   name: 'HelloWorld',
   data: () => ({
@@ -104,57 +103,37 @@ export default {
       (value) => {
         if (value) return true;
 
-        return 'Username is required.';
+        return 'Email is required.';
       },
       (value) => {
-        if (/^\S+$/.test(value)) return true;
+        if (/.+@.+\..+/.test(value)) return true;
 
-        return 'Username must be valid.';
+        return 'Email must be valid.';
       },
     ],
   }),
   setup() {
-    const email = ref();
-    const password = ref();
+    const user = ref({ email: 'admin@gmail.com', password: 'admin' });
     const error = ref();
     const success = ref();
-    if (router.currentRoute.value.query.message) {
-      success.value = router.currentRoute.value.query.message;
-      setTimeout(() => {
-        success.value = '';
-      }, 3000);
-    }
+    const show = ref(false);
+    const store = useStore();
 
     const login = async () => {
-      await axios
-        .post(
-          '/auth',
-          {
-            email: email.value,
-            password: password.value,
-          },
-          { withCredentials: true },
-        )
-        .then((data) => {
-          const accessToken = data.data.data.accessToken;
-          const refreshToken = data.data.data.refreshToken;
-          localStorage.setItem('accessToken', accessToken);
-          localStorage.setItem('refreshToken', refreshToken);
+      show.value = true;
+
+      await store
+        .dispatch('auth/login', user.value)
+        .then(() => {
           router.push({ name: 'home' });
+          show.value = false;
         })
         .catch((err) => {
-          if (err.response.data) {
-            error.value = err.response.data.message;
-            setTimeout(() => {
-              error.value = '';
-            }, 3000);
-          } else {
-            console.log(err);
-          }
+          console.log(err);
         });
     };
 
-    return { email, password, login, error, success };
+    return { user, login, error, success, show };
   },
 };
 </script>

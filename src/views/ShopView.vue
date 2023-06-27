@@ -1,29 +1,7 @@
 <template>
   <v-card max-width="448" class="mx-auto" color="grey-lighten-3">
     <v-layout>
-      <v-app-bar color="teal">
-        <v-app-bar-title>
-          <v-text-field
-            @keyup.prevent="searchProduct"
-            v-model="query"
-            class="flex-full-width pt-5"
-            density="comfortable"
-            placeholder="Search products"
-            prepend-inner-icon="mdi-magnify"
-            rounded
-            theme="light"
-            variant="solo"
-          ></v-text-field>
-        </v-app-bar-title>
-
-        <v-btn icon to="keranjang">
-          <v-badge v-if="contentValue !== 0" :content="contentValue" color="error">
-            <v-icon size="25">mdi-cart-outline</v-icon>
-          </v-badge>
-
-          <v-icon v-else size="25">mdi-cart-outline</v-icon>
-        </v-btn>
-      </v-app-bar>
+      <HeaderViewVue></HeaderViewVue>
 
       <v-main class="overflow-y-auto bg-white element">
         <v-container fluid>
@@ -43,13 +21,13 @@
               ></v-carousel-item>
             </v-carousel>
           </v-row>
-          <v-row v-if="!products.length" dense>
+          <v-row v-if="!data.products" dense>
             <v-col>
-              <h6 class="text-center">Tidak ada product dengan nama "{{ query }}""</h6>
+              <h6 class="text-center">"{{ query }}" tidak ditemukan.</h6>
             </v-col>
           </v-row>
           <v-row v-else dense>
-            <v-col cols="4" v-for="product in products" :key="product">
+            <v-col cols="4" v-for="product in data.products" :key="product">
               <v-dialog width="auto">
                 <template v-slot:activator="{ props }">
                   <v-card max-height="150" v-bind="props">
@@ -92,7 +70,7 @@
                       ></v-text-field>
                       <v-btn
                         variant="text"
-                        @click="addToCart(product._id), (isActive.value = false)"
+                        @click.prevent="addToCart(product._id), (isActive.value = false)"
                         color="green"
                       >
                         <v-icon size="30">mdi-cart-plus</v-icon>
@@ -108,136 +86,54 @@
           </v-row>
         </v-container>
       </v-main>
-      <v-bottom-navigation v-model="value" active bg-color="teal" grow mode="shift">
-        <v-btn value="home" to="home">
-          <v-icon>mdi-home-outline</v-icon>
-          Home
-        </v-btn>
 
-        <v-btn value="chat" @click="snackbar = true">
-          <v-icon>mdi-chat-outline</v-icon>
-          chat
-        </v-btn>
-
-        <v-btn value="akun" @click="snackbar = true">
-          <v-icon>mdi-account-outline</v-icon>
-          Akun
-        </v-btn>
-      </v-bottom-navigation>
-
-      <v-snackbar v-model="snackbar" vertical timeout="3000">
-        <div class="text-subtitle-1 pb-2">Info</div>
-        <p>Fitur ini masih dalam tahap pengembangan</p>
-        <template v-slot:actions>
-          <v-btn color="indigo" variant="text" @click="snackbar = false"> Close </v-btn>
-        </template>
-      </v-snackbar>
+      <FooterView></FooterView>
     </v-layout>
   </v-card>
 </template>
 <script>
-import { onMounted, ref } from 'vue';
-import axios from 'axios';
-import jwtDecode from 'jwt-decode';
-import router from '@/router';
+import HeaderViewVue from '@/components/HeaderView.vue';
+import FooterView from '@/components/FooterView.vue';
+import { computed, onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
 export default {
+  components: { FooterView, HeaderViewVue },
+
   setup() {
     const snackbar = ref(false);
-    const products = ref([]);
     const count = ref(1);
-    const query = ref(null);
-
     const contentValue = ref(0);
+    const store = useStore();
 
-    const error = (err) => {
-      if (err.response.status == 401) {
-        router.push({ name: 'login' });
-      }
-      console.log(err);
-    };
-
-    const getProducts = async () => {
-      try {
-        await axios.get('/products').then((response) => {
-          products.value = response.data.data.products.sort((productA, productB) => {
-            return productA.name.localeCompare(productB.name);
-          });
-        });
-      } catch (err) {
-        error(err);
-      }
-    };
-
-    const searchProduct = () => {
-      try {
-        axios.get(`/products/?productName=${query.value}`).then((response) => {
-          products.value = response.data.data.products.sort((productA, productB) => {
-            return productA.name.localeCompare(productB.name);
-          });
-        });
-      } catch (err) {
-        error(err);
-      }
-    };
-
-    const refreshAccessToken = async () => {
-      try {
-        const accessToken = localStorage.getItem('accessToken');
-        const tokenDecoded = jwtDecode(accessToken);
-        const currentTime = new Date().getTime();
-        if (currentTime > (tokenDecoded.iat + 13) * 1000) {
-          await axios
-            .put('/auth', {
-              refreshToken: localStorage.getItem('refreshToken'),
-            })
-            .then((response) => {
-              const neAccessToken = response.data.data.accessToken;
-              localStorage.setItem('accessToken', neAccessToken);
-            });
-        }
-      } catch (err) {
-        error(err);
-      }
-    };
+    onMounted(async () => {
+      store.dispatch('productsStore/getProducts');
+    });
 
     const addToCart = async (productId) => {
-      try {
-        await refreshAccessToken();
-        await axios.post(
-          '/carts',
-          {
-            id: productId,
-            count: parseInt(count.value),
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-            },
-          },
-        );
-        count.value = 1;
-        getProductsCart();
-      } catch (err) {
-        error(err);
-      }
+      await store.dispatch('productsStore/addToCart', { productId, count: count.value });
     };
+    const data = computed(() => {
+      const products = store.state.productsStore.products;
+      const message = store.state.productsStore.message;
+      return { products, message };
+    });
 
-    const getProductsCart = async () => {
-      try {
-        await refreshAccessToken();
-        await axios
-          .get('/carts/products', {
-            headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-            },
-          })
-          .then((response) => {
-            contentValue.value = response.data.data.products.length;
-          });
-      } catch (err) {
-        error(err);
-      }
-    };
+    // const getProductsCart = async () => {
+    //   try {
+    //     await refreshAccessToken();
+    //     await axios
+    //       .get('/carts/products', {
+    //         headers: {
+    //           Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
+    //         },
+    //       })
+    //       .then((response) => {
+    //         contentValue.value = response.data.data.products.length;
+    //       });
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // };
 
     // const logOut = () => {
     //   axios
@@ -253,13 +149,7 @@ export default {
     //     });
     // };
 
-    onMounted(() => {
-      getProducts();
-      refreshAccessToken();
-      getProductsCart();
-    });
-
-    return { products, addToCart, contentValue, snackbar, count, searchProduct, query };
+    return { data, addToCart, contentValue, snackbar, count };
   },
 };
 </script>
