@@ -1,8 +1,11 @@
 <script>
+import FooterView from '@/components/FooterView.vue';
+
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
+  components: { FooterView },
   setup() {
     const store = useStore();
     const snackbar = ref(false);
@@ -189,22 +192,7 @@ export default {
         </v-container>
       </v-main>
 
-      <v-bottom-navigation v-model="value" active bg-color="teal" grow mode="shift">
-        <v-btn value="home" to="home">
-          <v-icon>mdi-home-outline</v-icon>
-          Home
-        </v-btn>
-
-        <v-btn value="chat" @click="snackbar = true">
-          <v-icon>mdi-chat-outline</v-icon>
-          chat
-        </v-btn>
-
-        <v-btn value="akun" @click="snackbar = true">
-          <v-icon>mdi-account-outline</v-icon>
-          Akun
-        </v-btn>
-      </v-bottom-navigation>
+      <FooterView></FooterView>
 
       <v-snackbar v-model="snackbar" vertical timeout="3000">
         <div class="text-subtitle-1 pb-2">Info</div>

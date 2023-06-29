@@ -1,31 +1,36 @@
 <template>
   <div class="bg-white min-vh-100 d-flex align-center pa-0 mx-0">
     <v-row class="min-vw-100 min-vh-100 pa-0">
-      <v-col cols="5" class="bg-white ma-0 d-flex justify-center align-self-center form flex-wrap">
+      <v-alert
+        v-if="error"
+        color="red"
+        elevation="2"
+        type="warning"
+        max-width="300"
+        border="start"
+        class="message text-white text-capitalize pa-3 mx-10 mt-2"
+        >{{ error }}
+        <v-progress-linear v-model="progres_linear" bg-color="white" color="white">
+        </v-progress-linear>
+      </v-alert>
+      <v-alert
+        v-if="success"
+        color="success"
+        elevation="2"
+        type="success"
+        border="start"
+        class="message text-capitalize pb-3"
+        >{{ success }}
+        <v-progress-linear v-model="progres_linear" bg-color="white" color="white">
+        </v-progress-linear
+      ></v-alert>
+      <v-col cols="4" class="bg-white ma-0 d-flex justify-center align-self-center form flex-wrap">
         <v-form @submit.prevent style="width: 80%" class="overflow-visible">
-          <v-alert
-            v-if="error"
-            color="red"
-            elevation="2"
-            type="warning"
-            border="start"
-            class="message text-white d-flex text-capitalize justify-center pb-3"
-            >{{ error }}</v-alert
-          >
-          <v-alert
-            v-if="success"
-            color="success"
-            elevation="2"
-            type="success"
-            border="start"
-            class="message d-flex text-capitalize justify-center pb-3"
-            >{{ success }}</v-alert
-          >
           <div class="w-100 pb-5">
             <h4 class="font-weight-bold">Sign Up</h4>
             <p class="font-weight-reguler">
               Silakan isi form dibawah untuk membuat
-              <strong class="text-success">akun</strong> baru.
+              <strong class="text-teal">akun</strong> baru.
             </p>
           </div>
 
@@ -37,12 +42,13 @@
             prepend-inner-icon="mdi-account-outline"
             :rules="usernameRules"
             variant="outlined"
-            color="success"
+            color="teal"
             class="pb-3"
           ></v-text-field>
 
           <v-text-field
-            color="success"
+            color="teal"
+            type="number"
             v-model="user.phoneNumber"
             required
             density="compact"
@@ -54,8 +60,9 @@
           </v-text-field>
 
           <v-text-field
-            color="success"
+            color="teal"
             type="email"
+            name="email"
             v-model="user.email"
             :rules="emailRules"
             density="compact"
@@ -77,13 +84,13 @@
             v-model="user.password"
             :rules="passRule"
             required
-            color="success"
+            color="teal"
             class="pb-3"
           >
           </v-text-field>
 
           <v-text-field
-            color="success"
+            color="teal"
             required
             :append-inner-icon="visible2 ? 'mdi-eye-off' : 'mdi-eye'"
             :type="visible2 ? 'text' : 'password'"
@@ -98,7 +105,7 @@
           >
           </v-text-field>
 
-          <v-btn block class="mb-8" color="success" @click="registrasi">
+          <v-btn block class="mb-8" color="teal" @click="registrasi">
             <span class="pr-3"> Sign Up </span>
             <v-progress-circular :width="6" :size="30" color="white" indeterminate v-show="show">
             </v-progress-circular>
@@ -106,8 +113,8 @@
 
           <v-card-text class="text-center">
             <router-link
-              class="text-success text-decoration-none"
-              :to="{ name: 'login' }"
+              class="text-teal text-decoration-none"
+              :to="{ name: 'Login' }"
               rel="noopener noreferrer"
               style="font-size: 14px"
             >
@@ -118,13 +125,9 @@
         </v-form>
       </v-col>
 
-      <v-col cols="7" class="pa-0 image">
-        <v-card class="h-100 rounded-s-xl">
-          <v-img
-            cover
-            class="h-100"
-            src="https://images.unsplash.com/photo-1497294815431-9365093b7331?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80"
-          ></v-img>
+      <v-col cols="8" class="py-5 pe-8 image">
+        <v-card class="h-100 rounded-e-xl">
+          <v-img cover class="h-100" src="../assets/bg.jpeg"></v-img>
         </v-card>
       </v-col>
     </v-row>
@@ -193,12 +196,15 @@ export default defineComponent({
     const show = ref(false);
     const error = ref();
     const success = ref();
+    const progres_linear = ref(0);
+    let idInterval = [];
+
     const user = ref({
-      username: 'acha',
-      phoneNumber: '123456789012',
-      email: 'a@gmail.com',
-      password: '#Mangidi7',
-      confirmPassword: '#Mangidi7l',
+      username: '',
+      phoneNumber: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     });
     const store = useStore();
 
@@ -207,26 +213,39 @@ export default defineComponent({
         (value) => value === user.value.password || 'Password and confirm password do not match.',
       ];
     });
+
     const registrasi = async () => {
       show.value = true;
+      progres_linear.value = 0;
 
       await store.dispatch('auth/register', user.value);
       error.value = await store.state.auth.errorMessage;
       success.value = await store.state.auth.successMessage;
-      setTimeout(() => {
-        error.value = null;
-        success.value = null;
-      }, 5000);
+
+      const interval = setInterval(() => {
+        progres_linear.value++;
+        if (progres_linear.value >= 100) {
+          error.value = null;
+          success.value = null;
+          idInterval.map((id) => {
+            clearInterval(id);
+          });
+          idInterval = [];
+        }
+      }, 30);
+      idInterval.push(interval);
+
       show.value = false;
+      progres_linear.value = 0;
     };
     return {
       user,
-
       confirmPassRules,
       registrasi,
       error,
       success,
       show,
+      progres_linear,
     };
   },
 });
@@ -240,9 +259,7 @@ main {
   background-color: #1d212b;
   filter: brightness(90%);
 }
-.message {
-  height: auto;
-}
+
 @media (max-width: 700px) {
   .image {
     display: none;

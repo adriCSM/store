@@ -1,18 +1,19 @@
 <template>
   <v-bottom-navigation v-model="value" active bg-color="teal" grow mode="shift">
     <v-btn value="home" to="home">
-      <v-icon>mdi-home-outline</v-icon>
-      Home
+      <v-icon size="30">mdi-home</v-icon>
+
+      <v-tooltip activator="parent" location="top"> Home </v-tooltip>
     </v-btn>
 
     <v-btn value="chat" @click="snackbar = true">
-      <v-icon>mdi-chat-outline</v-icon>
-      chat
+      <v-icon size="35">mdi-dropbox</v-icon>
+      <v-tooltip activator="parent" location="top"> Pesanan </v-tooltip>
     </v-btn>
 
-    <v-btn value="akun" @click="snackbar = true">
-      <v-icon>mdi-account-outline</v-icon>
-      Akun
+    <v-btn value="akun" :to="`profile`">
+      <v-icon size="30"> mdi-account</v-icon>
+      <v-tooltip activator="parent" location="top"> Akun </v-tooltip>
     </v-btn>
   </v-bottom-navigation>
 
@@ -27,6 +28,7 @@
 
 <script>
 import { ref } from 'vue';
+
 export default {
   setup() {
     const snackbar = ref(false);

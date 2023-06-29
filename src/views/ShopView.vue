@@ -1,6 +1,18 @@
 <template>
   <v-card max-width="448" class="mx-auto" color="grey-lighten-3">
     <v-layout>
+      <v-alert
+        v-if="successMessage"
+        color="success"
+        elevation="2"
+        type="success"
+        border="start"
+        class="message text-capitalize pb-3"
+        >{{ successMessage }}
+        <v-progress-linear v-model="progres_linear" bg-color="white" color="white">
+        </v-progress-linear
+      ></v-alert>
+
       <HeaderViewVue></HeaderViewVue>
 
       <v-main class="overflow-y-auto bg-white element">
@@ -101,12 +113,17 @@ export default {
 
   setup() {
     const snackbar = ref(false);
+    const always = ref(true);
     const count = ref(1);
     const contentValue = ref(0);
     const store = useStore();
+    const successMessage = ref(store.state.auth.successMessage);
+    setTimeout(() => {
+      successMessage.value = null;
+    }, 5000);
 
     onMounted(async () => {
-      store.dispatch('productsStore/getProducts');
+      await store.dispatch('productsStore/getProducts');
     });
 
     const addToCart = async (productId) => {
@@ -118,38 +135,7 @@ export default {
       return { products, message };
     });
 
-    // const getProductsCart = async () => {
-    //   try {
-    //     await refreshAccessToken();
-    //     await axios
-    //       .get('/carts/products', {
-    //         headers: {
-    //           Authorization: 'Bearer ' + localStorage.getItem('accessToken'),
-    //         },
-    //       })
-    //       .then((response) => {
-    //         contentValue.value = response.data.data.products.length;
-    //       });
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // };
-
-    // const logOut = () => {
-    //   axios
-    //     .delete('/auth', {
-    //       refreshToken: localStorage.getItem('refreshToken'),
-    //     })
-    //     .then(() => {
-    //       localStorage.removeItem('accessToken');
-    //       localStorage.removeItem('refreshToken');
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // };
-
-    return { data, addToCart, contentValue, snackbar, count };
+    return { data, addToCart, contentValue, snackbar, count, successMessage, always };
   },
 };
 </script>

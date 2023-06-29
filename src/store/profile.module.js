@@ -1,44 +1,40 @@
-import ProfileService from "@/services/profile.service"
+import ProfileService from '@/services/profile.service';
+import jwtDecode from 'jwt-decode';
 
 const initialState = { userProfile: null };
+import { handler } from '../services/error-handler';
 
 export const profile = {
-    namespaced: true,
-    state: initialState,
-    actions: {
-        async getProfile({ commit }) {
-            const userProfile = await ProfileService.getProfile();
-            commit('success', userProfile);
-        },
-
-        async editProfile({ commit }, modifiedProfile) {
-            const userProfile = await ProfileService.editProfile(modifiedProfile);
-            commit('success', userProfile);
-        },
-
-        //eslint-disable-next-line no-unused-vars
-        async uploadPic({ commit }, file) {
-           const picURL = (await ProfileService.uploadPic(file, this.state.profile.userProfile.id)).url;
-           commit('successUpload', picURL);
-        },
-
-        
-
+  namespaced: true,
+  state: initialState,
+  actions: {
+    async getProfile({ commit }) {
+      try {
+        const token = JSON.parse(localStorage.getItem('user_id'));
+        const { id: userId } = jwtDecode(token);
+        const userProfile = await ProfileService.getProfile(userId);
+        commit('success', userProfile);
+      } catch (error) {
+        handler.errorHandling(error);
+      }
     },
-    mutations: {
-        success(state, userProfile) {
-            state.userProfile = userProfile;
-        },
-        successUpload(state, picURL){
-            state.userProfile.profile_image = picURL;
-        }
+
+    // async editProfile({ commit }, modifiedProfile) {
+    //   const userProfile = await ProfileService.editProfile(modifiedProfile);
+    //   commit('success', userProfile);
+    // },
+
+    // async uploadPic({ commit }, file) {
+    //   const picURL = (await ProfileService.uploadPic(file, this.state.profile.userProfile.id)).url;
+    //   commit('successUpload', picURL);
+    // },
+  },
+  mutations: {
+    success(state, userProfile) {
+      state.userProfile = userProfile;
     },
-    getters: {
-        getUserProfile(state){
-            return state.userProfile
-        },
-        getUserProfileImage(state){
-            return state.userProfile.profile_image
-        }
-    }
-}
+    successUpload(state, picURL) {
+      state.userProfile.profile_image = picURL;
+    },
+  },
+};

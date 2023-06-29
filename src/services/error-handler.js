@@ -3,12 +3,14 @@ import store from '@/store';
 
 export const handler = {
   errorHandling(err) {
-    if (err.response.status == 401) {
-      router.push({ name: 'login' });
+    if (err.message == 'Invalid token specified' || err.response.status == 401) {
+      router.push({ name: 'Login' });
     }
-    store.commit('auth/errorMessage', err.response.data.message);
-    setTimeout(() => {
-      store.commit('auth/errorMessage', null);
-    });
+    if (err.response) {
+      store.commit('auth/errorMessage', err.response.data.message);
+      setTimeout(() => {
+        store.commit('auth/errorMessage', null);
+      });
+    }
   },
 };
