@@ -6,7 +6,7 @@ import { loadFonts } from './plugins/webfontloader';
 import axios from 'axios';
 import store from './store';
 
-axios.defaults.baseURL = 'http://localhost:4000';
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
 loadFonts();

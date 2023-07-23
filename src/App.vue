@@ -1,19 +1,23 @@
 <template>
   <v-app>
+    <HeaderViewVue
+      v-if="
+        router.currentRoute.value.name !== 'Register' || router.currentRoute.value.name !== 'Login'
+      "
+    />
+    <AlertWeb />
     <v-main>
-      <router-view />
+      <router-view class="d-flex flex-column justify-center mt-5" />
     </v-main>
+    <!-- <FooterView></FooterView> -->
   </v-app>
 </template>
 
-<script>
-export default {
-  name: 'App',
-
-  data: () => ({
-    //
-  }),
-};
+<script setup>
+// import FooterView from '@/components/FooterView.vue';
+import router from '@/router';
+import AlertWeb from '@/components/AlertWeb.vue';
+import HeaderViewVue from '@/components/HeaderView.vue';
 </script>
 <style>
 #app {
@@ -21,11 +25,7 @@ export default {
 }
 main {
   min-height: 100vh;
-  /* background-image: url('./assets/utsman-media-QOqwoaWqqn8-unsplash.jpg'); */
-  /* background-size: cover;
-    background-repeat: no-repeat; */
-  /* background-position-y: 100%; */
-  background-color: #1d212b;
-  filter: brightness(90%);
+
+  background-color: #f5f5f5;
 }
 </style>

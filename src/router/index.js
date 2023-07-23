@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/',
     name: 'redirect',
-    redirect: '/auth/login',
+    redirect: '/home',
   },
   {
     path: '/auth/registrasi',
@@ -27,6 +27,11 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: () => import(/* webpackChunkName: "about" */ '../views/ShopView.vue'),
+  },
+  {
+    path: '/product/detail/:id',
+    name: 'Detail Product',
+    component: () => import('../views/DetileView.vue'),
   },
 
   {

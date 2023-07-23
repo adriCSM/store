@@ -2,8 +2,12 @@ import axios from 'axios';
 import authHeader from './auth-header';
 export default {
   async getProducts() {
-    const response = await axios.get('/products');
+    const response = await axios.get('/store/products');
     return response.data;
+  },
+  async getProduct(id) {
+    const response = await axios.get('/store/products/' + id);
+    return response.data.data.product;
   },
 
   async searchProduct(query) {
@@ -26,7 +30,7 @@ export default {
   },
 
   async getProductsCart() {
-    const response = await axios.get('/carts/products', {
+    const response = await axios.get('/store/carts/products', {
       headers: await authHeader(),
     });
 

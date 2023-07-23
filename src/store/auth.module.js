@@ -2,6 +2,7 @@ import jwtDecode from 'jwt-decode';
 import AuthService from '../services/auth.service';
 import ProfileService from '@/services/profile.service';
 import { handler } from '../services/error-handler';
+import router from '@/router';
 
 const user = JSON.parse(localStorage.getItem('user_free'));
 const initialState = user ? { loggedIn: true } : { loggedIn: false };
@@ -22,6 +23,7 @@ export const auth = {
           commit('successMessage', null);
         }, 1000);
         commit('isLoggedIn', true);
+        router.push({ name: 'Home' });
         return response.data;
       } catch (error) {
         commit('isLoggedIn', false);

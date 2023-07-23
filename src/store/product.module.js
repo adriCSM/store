@@ -1,14 +1,17 @@
 import productService from '../services/product.service';
 import { handler } from '../services/error-handler';
 
-const initialState = { products: null };
+const initialState = { data: null, product: null };
 
-export const productsStore = {
+export const products = {
   namespaced: true,
   state: initialState,
   mutations: {
-    successGet(state, products) {
-      state.products = products;
+    data(state, data) {
+      state.data = data;
+    },
+    product(state, product) {
+      state.product = product;
     },
     message(state, message) {
       state.message = message;
@@ -24,7 +27,15 @@ export const productsStore = {
     async getProducts({ commit }) {
       try {
         const response = await productService.getProducts();
-        commit('successGet', response.data.products);
+        commit('data', response.data.products);
+      } catch (error) {
+        handler.errorHandling(error);
+      }
+    },
+    async getProduct({ commit }, id) {
+      try {
+        const response = await productService.getProduct(id);
+        commit('product', response);
       } catch (error) {
         handler.errorHandling(error);
       }
