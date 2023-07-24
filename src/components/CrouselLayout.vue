@@ -1,23 +1,18 @@
-<script>
-export default {
-  data: () => ({
-    length: 3,
-    window: 0,
-    colors: ['indigo', 'warning', 'pink darken-2', 'red lighten-1', 'deep-purple accent-4'],
-    slides: ['First', 'Second', 'Third', 'Fourth', 'Fifth'],
-  }),
-};
+<script setup>
+import vuetify from '@/plugins/vuetify';
+import { computed } from 'vue';
+const md = computed(() => (vuetify.display.mdAndUp.value ? true : false));
 </script>
 <template>
-  <v-window v-model="window">
-    <v-carousel cycle height="300" hide-delimiter-background show-arrows="hover">
-      <v-carousel-item v-for="(slide, i) in slides" :key="i">
-        <v-sheet :color="colors[i]" height="100%">
-          <div class="d-flex fill-height justify-center align-center">
-            <div class="text-h2">{{ slide }} Slide</div>
-          </div>
-        </v-sheet>
-      </v-carousel-item>
-    </v-carousel>
-  </v-window>
+  <v-carousel cycle show-arrows="hover" :height="md ? 300 : 200">
+    <v-carousel-item src="https://cdn.vuetifyjs.com/images/cards/docks.jpg" cover>
+    </v-carousel-item>
+
+    <v-carousel-item src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg" cover></v-carousel-item>
+
+    <v-carousel-item
+      src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+      cover
+    ></v-carousel-item>
+  </v-carousel>
 </template>

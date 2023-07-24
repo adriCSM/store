@@ -1,6 +1,10 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, defineProps, computed } from 'vue';
 import DialogImage from '@/components/DialogImage.vue';
+const props = defineProps({
+  image: String,
+});
+const image = computed(() => props.image);
 
 const model = ref(null);
 const dialog = ref(false);
@@ -15,7 +19,7 @@ const dialog = ref(false);
           height="50"
           width="50"
           @click="toggle, (dialog = true)"
-          src="../assets/109715820.jpg"
+          :src="image"
         >
           <DialogImage hidden :dialog="dialog" />
         </v-img>

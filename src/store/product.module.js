@@ -1,5 +1,6 @@
 import productService from '../services/product.service';
 import { handler } from '../services/error-handler';
+import store from '@/store';
 
 const initialState = { data: null, product: null };
 
@@ -26,8 +27,10 @@ export const products = {
   actions: {
     async getProducts({ commit }) {
       try {
+        store.commit('loading', true);
         const response = await productService.getProducts();
         commit('data', response.data.products);
+        store.commit('loading', false);
       } catch (error) {
         handler.errorHandling(error);
       }

@@ -1,29 +1,6 @@
 <template>
   <div class="bg-white min-vh-100 d-flex align-center pa-0 mx-0">
     <v-row class="min-vw-100 min-vh-100 pa-0">
-      <v-alert
-        v-if="error"
-        color="red"
-        elevation="2"
-        type="warning"
-        max-width="300"
-        border="start"
-        class="message text-white text-capitalize pa-3 mx-10 mt-2"
-        >{{ error }}
-        <v-progress-linear v-model="progres_linear" bg-color="white" color="white">
-        </v-progress-linear>
-      </v-alert>
-      <v-alert
-        v-if="success"
-        color="success"
-        elevation="2"
-        type="success"
-        border="start"
-        class="message text-capitalize pb-3"
-        >{{ success }}
-        <v-progress-linear v-model="progres_linear" bg-color="white" color="white">
-        </v-progress-linear
-      ></v-alert>
       <v-col cols="4" class="bg-white ma-0 d-flex justify-center align-self-center form flex-wrap">
         <v-form @submit.prevent style="width: 80%" class="overflow-visible">
           <div class="w-100 pb-5">
@@ -250,22 +227,4 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-#app {
-  height: 100vh;
-}
-main {
-  min-height: 100vh;
-  background-color: #1d212b;
-  filter: brightness(90%);
-}
-
-@media (max-width: 700px) {
-  .image {
-    display: none;
-  }
-  .form {
-    min-width: 100%;
-  }
-}
-</style>
+<style></style>

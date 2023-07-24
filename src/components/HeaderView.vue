@@ -1,5 +1,13 @@
 <template>
-  <v-app-bar color="teal" :height="vuetify.display.smAndUp.value ? 125 : 70">
+  <v-app-bar
+    color="teal"
+    :height="vuetify.display.smAndUp.value ? 125 : 70"
+    v-if="
+      router.currentRoute.value.name !== 'Login' &&
+      router.currentRoute.value.name !== 'Register' &&
+      router.currentRoute.value.name !== 'Keranjang'
+    "
+  >
     <div class="w-100 mt-5 d-flex flex-column align-center">
       <v-row class="w-75" v-if="vuetify.display.smAndUp.value">
         <v-spacer></v-spacer>
@@ -7,15 +15,17 @@
           Daftar
         </v-btn>
         <v-divider vertical color="white" thickness="5"> </v-divider>
-        <v-btn variant="text" icon="mdi-login" to="auth/login" class="text-capitalize ms-5">
+        <v-btn variant="text" icon="mdi-login" to="/auth/login" class="text-capitalize ms-5">
           Log In
         </v-btn>
       </v-row>
       <v-row class="w-100 ma-0" justify="center">
         <v-col cols="auto" v-if="vuetify.display.smAndUp.value">
-          <v-img src="../assets/logoam2.png" width="100" />
+          <router-link to="/home">
+            <v-img src="../assets/logoam2.png" width="100" />
+          </router-link>
         </v-col>
-        <v-col md="7">
+        <v-col md="7 pe-0">
           <v-text-field
             @keyup.prevent="searchProduct"
             v-model="query"
@@ -27,8 +37,8 @@
             variant="solo"
           ></v-text-field>
         </v-col>
-        <v-col cols="auto">
-          <v-btn icon to="keranjang">
+        <v-col cols="auto" class="px-0">
+          <v-btn icon to="/keranjang">
             <v-badge v-if="contentValue !== 0" :content="contentValue" color="error">
               <v-icon size="25">mdi-cart-outline</v-icon>
             </v-badge>
@@ -42,4 +52,5 @@
 </template>
 <script setup>
 import vuetify from '@/plugins/vuetify';
+import router from '@/router';
 </script>

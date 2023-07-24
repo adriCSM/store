@@ -4,7 +4,9 @@ import SlideGroup from '@/components/SlideGroup.vue';
 import ButtonBack from '@/components/ButtonBack.vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+import vuetify from '@/plugins/vuetify';
 
+const mdUp = computed(() => vuetify.display.mdAndUp.value);
 const rating = ref(4.5);
 const count = ref(1);
 
@@ -40,7 +42,7 @@ const angka1 = () => {
 };
 </script>
 <template>
-  <v-container v-if="product">
+  <v-container v-if="product" :class="mdUp ? 'mt-5' : 'mt-0'">
     <v-row justify="center">
       <v-col style="background-color: #ffffff">
         <v-row>
@@ -48,7 +50,7 @@ const angka1 = () => {
             <ButtonBack style="position: fixed; z-index: 99" />
 
             <v-img width="100%" :src="product.image"></v-img>
-            <SlideGroup />
+            <SlideGroup :image="product.image" />
             <div class="d-flex justify-space-around">
               <div>
                 Share:
@@ -84,6 +86,14 @@ const angka1 = () => {
             <span>134 Penilaian</span>
             <span class="mx-3"> | </span>
             <span>123 Terjual</span>
+
+            <div class="pt-10">
+              <div class="text-title">Deskripsi Produk:</div>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit laudantium provident
+                vero eaque quo natus autem explicabo dicta ipsum libero!
+              </p>
+            </div>
 
             <div class="pt-10">
               <span>Kuantitas</span>

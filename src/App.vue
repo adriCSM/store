@@ -1,13 +1,14 @@
 <template>
   <v-app>
-    <HeaderViewVue
-      v-if="
-        router.currentRoute.value.name !== 'Register' || router.currentRoute.value.name !== 'Login'
-      "
-    />
+    <HeaderViewVue />
+    <HeaderKeranjang />
     <AlertWeb />
+    <LoadProgres
+      style="position: fixed; z-index: 9999; align-self: center; justify-self: center"
+      class="mt-15"
+    />
     <v-main>
-      <router-view class="d-flex flex-column justify-center mt-5" />
+      <router-view />
     </v-main>
     <!-- <FooterView></FooterView> -->
   </v-app>
@@ -15,9 +16,10 @@
 
 <script setup>
 // import FooterView from '@/components/FooterView.vue';
-import router from '@/router';
+import LoadProgres from '@/components/LoadProgres.vue';
 import AlertWeb from '@/components/AlertWeb.vue';
 import HeaderViewVue from '@/components/HeaderView.vue';
+import HeaderKeranjang from '@/components/HeaderKeranjang.vue';
 </script>
 <style>
 #app {
