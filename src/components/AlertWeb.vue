@@ -61,7 +61,7 @@ const timer = (mutation) => {
 </script>
 
 <template>
-  <v-row>
+  <v-row style="max-width: 400px; position: fixed; z-index: 9999" class="mt-15">
     <v-col>
       <v-alert
         v-if="success"

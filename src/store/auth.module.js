@@ -4,7 +4,7 @@ import ProfileService from '@/services/profile.service';
 import { handler } from '../services/error-handler';
 import router from '@/router';
 
-const user = JSON.parse(localStorage.getItem('user_free'));
+const user = JSON.parse(localStorage.getItem('user'));
 const initialState = user ? { loggedIn: true } : { loggedIn: false };
 
 export const auth = {

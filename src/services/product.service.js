@@ -15,26 +15,26 @@ export default {
     return response.data;
   },
 
-  async addToCart(product) {
+  async addToCart(payload) {
     const response = await axios.post(
-      '/carts',
+      '/store/carts',
       {
-        id: product.productId,
-        count: product.count,
+        id: payload.productId,
+        count: payload.count,
       },
       {
         headers: await authHeader(),
       },
     );
-    return response.data;
+    return response.data.message;
   },
 
   async getProductsCart() {
-    const response = await axios.get('/store/carts/products', {
+    const response = await axios.get('/store/carts', {
       headers: await authHeader(),
     });
 
-    return response.data;
+    return response.data.data.products;
   },
 
   async changeCountProduct(product) {

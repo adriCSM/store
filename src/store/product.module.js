@@ -2,7 +2,7 @@ import productService from '../services/product.service';
 import { handler } from '../services/error-handler';
 import store from '@/store';
 
-const initialState = { data: null, product: null };
+const initialState = { data: null, product: null, cart: null, productCount: null };
 
 export const products = {
   namespaced: true,
@@ -17,11 +17,11 @@ export const products = {
     message(state, message) {
       state.message = message;
     },
-    contentValue(state, contentValue) {
-      state.contentValue = contentValue;
+    productCount(state, productCount) {
+      state.productCount = productCount;
     },
-    cartProducts(state, cartProducts) {
-      state.cartProducts = cartProducts;
+    cart(state, cart) {
+      state.cart = cart;
     },
   },
   actions: {
@@ -29,8 +29,8 @@ export const products = {
       try {
         store.commit('loading', true);
         const response = await productService.getProducts();
-        commit('data', response.data.products);
         store.commit('loading', false);
+        commit('data', response.data.products);
       } catch (error) {
         handler.errorHandling(error);
       }
@@ -53,16 +53,13 @@ export const products = {
       }
     },
 
-    async addToCart({ commit }, product) {
+    async addToCart({ commit }, payload) {
       try {
-        const response = await productService.addToCart(product);
-        commit('message', response.message);
-        const response1 = await productService.getProductsCart();
-        commit('contentValue', response1.data.products.length);
-        commit('cartProducts', response1.data.products);
-        setTimeout(() => {
-          commit('message', null);
-        }, 5000);
+        const message = await productService.addToCart(payload);
+        const response = await productService.getProductsCart();
+        commit('productCount', response.length);
+        commit('cart', response);
+        store.commit('success', message);
       } catch (error) {
         handler.errorHandling(error);
       }
@@ -71,8 +68,8 @@ export const products = {
     async getProductsCart({ commit }) {
       try {
         const response = await productService.getProductsCart();
-        commit('contentValue', response.data.products.length);
-        commit('cartProducts', response.data.products);
+        commit('productCount', response.length);
+        commit('cart', response);
       } catch (error) {
         handler.errorHandling(error);
       }

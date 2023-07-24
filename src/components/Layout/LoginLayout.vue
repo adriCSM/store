@@ -30,6 +30,8 @@ onMounted(() => {
 const login = async () => {
   show.value = true;
   await store.dispatch('auth/login', user.value);
+  await store.dispatch('products/getProductsCart');
+
   show.value = false;
 };
 </script>

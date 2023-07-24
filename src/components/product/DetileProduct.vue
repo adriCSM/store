@@ -14,6 +14,7 @@ const stock = computed(() => parseInt(store.state.products.product.cuantity));
 const route = useRoute();
 const store = useStore();
 const id = route.params.id;
+const errorInput = ref(false);
 
 onMounted(async () => {
   await store.dispatch('products/getProduct', id);
@@ -30,7 +31,6 @@ const angka = (event) => {
     return false;
   }
 };
-const errorInput = ref(false);
 const angka1 = () => {
   if (stock.value < count.value) {
     errorInput.value = true;
@@ -39,6 +39,10 @@ const angka1 = () => {
   if (!count.value || count.value == 0) {
     return (errorInput.value = false);
   }
+};
+
+const keranjang = async () => {
+  await store.dispatch('products/addToCart', { productId: id, count: count.value });
 };
 </script>
 <template>
@@ -113,7 +117,7 @@ const angka1 = () => {
                   border: 1px solid grey;
                   height: 28px;
                   width: 50px;
-                  transform: translateY(2px);
+                  transform: translateY(1.7px);
                 "
                 class="text-center"
                 required
@@ -131,6 +135,7 @@ const angka1 = () => {
                 variant="outlined"
                 color="teal"
                 class="me-4 mb-2 text-capitalize"
+                @click="keranjang"
                 >Masukkan Keranjang</v-btn
               >
               <v-btn color="teal" class="text-capitalize mb-2">Beli Sekarang</v-btn>

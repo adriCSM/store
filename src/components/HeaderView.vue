@@ -38,8 +38,8 @@
           ></v-text-field>
         </v-col>
         <v-col cols="auto" class="px-0">
-          <v-btn icon to="/keranjang">
-            <v-badge v-if="contentValue !== 0" :content="contentValue" color="error">
+          <v-btn @click="keranjang" icon to="/keranjang">
+            <v-badge v-if="count" :content="count" color="error">
               <v-icon size="25">mdi-cart-outline</v-icon>
             </v-badge>
 
@@ -53,4 +53,17 @@
 <script setup>
 import vuetify from '@/plugins/vuetify';
 import router from '@/router';
+import { computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+const store = useStore();
+const isLogin = computed(() => store.state.auth.loggedIn);
+if (isLogin.value && !store.state.products.productCount) {
+  onMounted(async () => {
+    await store.dispatch('products/getProductsCart');
+  });
+}
+const keranjang = async () => {
+  await store.dispatch('products/getProductsCart');
+};
+const count = computed(() => store.state.products.productCount);
 </script>
