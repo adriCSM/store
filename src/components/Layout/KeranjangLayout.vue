@@ -1,22 +1,69 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import ButtonBack from '@/components/ButtonBack.vue';
-
+import DialogVue from '@/components/DialogVue.vue';
 import vuetify from '@/plugins/vuetify';
 import { useStore } from 'vuex';
 const smAndUp = computed(() => (vuetify.display.smAndUp.value ? true : false));
 const mdAndUp = computed(() => (vuetify.display.mdAndUp.value ? true : false));
 const store = useStore();
 const products = computed(() => store.state.products.cart);
+// emit and props
+const dialog = ref(false);
+const newDialog = (data) => {
+  dialog.value = data.dialog;
+  if (data.id) {
+    const product = products.value.find((product) => product.product_id._id == data.id);
+    product.count = 1;
+  }
+};
 
+// checkbox
 const selected = ref([]);
 const selectAll = ref(false);
+const selectAllItems = () => {
+  if (selectAll.value) {
+    selected.value = [];
+    products.value.map((product) => {
+      selected.value.push(product);
+    });
+  } else {
+    selected.value = [];
+  }
+};
+
+// plus/minus and type cuantity
+const plusMinus = async (id, event) => {
+  const product = products.value.find((product) => product.product_id._id == id);
+  event == 'plus' ? product.count++ : product.count--;
+  if (product.count !== 0) {
+    await store.dispatch('products/changeCountProduct', { id, count: product.count });
+  } else {
+    dialog.value = true;
+  }
+};
+const type = async (id, count) => {
+  if (count !== 0 && count != '') {
+    await store.dispatch('products/changeCountProduct', { id, count });
+  } else {
+    await store.dispatch('products/changeCountProduct', { id, count: 1 });
+
+    dialog.value = true;
+  }
+};
+
+// Delete and checkout
 const hapus = () => {
   console.log(selected.value);
 };
 const hapusSatu = () => {
   console.log(selected.value);
 };
+const checkout = () => {
+  console.log(products.value);
+};
+
+// memantau perubahan
 watch(
   selected,
   (newSelect) => {
@@ -29,24 +76,13 @@ watch(
   },
   { deep: true },
 );
+
 const totalHarga = ref(0);
 
-const selectAllItems = () => {
-  if (selectAll.value) {
-    selected.value = [];
-    products.value.map((product) => {
-      selected.value.push(product);
-    });
-  } else {
-    selected.value = [];
-  }
-};
-
+// membatasi inputan
 const stock = ref(50);
-
 const angka = (event) => {
   const angka = event.key;
-
   if ((angka >= '0' && angka <= '9') || angka === '.') {
     return true;
   } else {
@@ -58,7 +94,7 @@ const angka = (event) => {
 
 <template>
   <v-container class="pa-0">
-    <v-row justify="center" class="ma-0 mb-3" v-if="products">
+    <v-row justify="center" class="ma-0 mb-3">
       <v-col cols="11">
         <v-row align="center" class="bg-white">
           <v-col cols="2" v-show="!smAndUp">
@@ -131,6 +167,12 @@ const angka = (event) => {
                 >
                   Rp{{ product.product_id.price.toLocaleString('id-ID') }}</v-col
                 >
+                <DialogVue
+                  @data="newDialog"
+                  :dialog="dialog"
+                  :id="product.product_id._id"
+                  :name="product.product_id.name"
+                />
                 <v-col
                   class="d-flex flex-row me-3"
                   :class="!smAndUp ? 'ps-2' : 'pa-0'"
@@ -139,11 +181,13 @@ const angka = (event) => {
                 >
                   <button
                     style="border: 1px solid teal; height: 28px; transform: translateY(2px)"
-                    @click="product.count > 0 ? product.count-- : false"
+                    @click="product.count > 0 ? plusMinus(product.product_id._id, 'minus') : false"
                   >
                     <v-icon color="grey">mdi-minus</v-icon>
                   </button>
                   <input
+                    @keyup.enter="type(product.product_id._id, product.count)"
+                    @keyup="type(product.product_id._id, product.count)"
                     @keypress="angka"
                     type="text"
                     v-model="product.count"
@@ -158,7 +202,9 @@ const angka = (event) => {
                   />
                   <button
                     style="border: 1px solid teal; height: 28px; transform: translateY(2px)"
-                    @click="product.count < stock ? product.count++ : false"
+                    @click="
+                      product.count < stock ? plusMinus(product.product_id._id, 'plus') : false
+                    "
                   >
                     <v-icon color="grey">mdi-plus</v-icon>
                   </button>
@@ -175,7 +221,7 @@ const angka = (event) => {
           </v-col>
         </v-row>
         <v-row class="checkout bg-white">
-          <v-col cols="6" align-self="center">
+          <v-col :cols="smAndUp ? 3 : 6" align-self="center">
             <v-checkbox
               v-model="selectAll"
               @change="selectAllItems"
@@ -188,7 +234,6 @@ const angka = (event) => {
           <v-col align-self="center ms-3" v-if="smAndUp">
             <v-btn variant="text" @click="hapus"> hapus </v-btn>
           </v-col>
-          <v-spacer></v-spacer>
           <v-col align-self="center" v-if="smAndUp">
             Total({{ selected.length }} Produk):
             <span class="text-teal text-h5">Rp{{ totalHarga.toLocaleString('id-ID') }}</span>
@@ -200,7 +245,7 @@ const angka = (event) => {
             </p>
           </v-col>
           <v-col align-self="center ms-3">
-            <v-btn color="teal" :class="smAndUp ? '' : 'w-100'"> Checkout </v-btn>
+            <v-btn color="teal" :class="smAndUp ? '' : 'w-100'" @click="checkout"> Checkout </v-btn>
           </v-col>
         </v-row>
       </v-col>

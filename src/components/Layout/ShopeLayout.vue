@@ -51,6 +51,25 @@ const detail = (id) => {
             </v-card>
           </v-col>
         </v-row>
+        <v-row dense justify="left" v-if="products">
+          <v-col cols="6" md="2" sm="2" v-for="product in products" :key="product">
+            <v-card height="230" class="pb-2" color="#FFFFFF" @click="detail(product._id)">
+              <v-img :src="product.image" width="170" cover></v-img>
+              <v-card-title class="text-capitalize text-start ps-2" style="font-size: 12px">
+                {{ product.name }}
+              </v-card-title>
+              <div class="d-flex justify-space-between mx-2">
+                <v-card-title class="text-teal">
+                  Rp
+                  <span style="font-size: 15px">{{
+                    parseInt(product.price).toLocaleString('id-ID')
+                  }}</span>
+                </v-card-title>
+                <v-card-title> 20 Terjual </v-card-title>
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>

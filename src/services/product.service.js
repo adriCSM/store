@@ -39,10 +39,9 @@ export default {
 
   async changeCountProduct(product) {
     const response = await axios.put(
-      '/carts',
+      '/store/carts',
       {
-        id: product.productId,
-        count: product.count,
+        ...product,
       },
       {
         headers: await authHeader(),
@@ -52,7 +51,7 @@ export default {
     return response.data;
   },
   async deleteProductsCart(productId) {
-    const response = await axios.delete('/carts/' + productId, {
+    const response = await axios.delete('/store/carts/' + productId, {
       headers: await authHeader(),
     });
     return response.data;

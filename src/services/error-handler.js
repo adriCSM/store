@@ -1,5 +1,4 @@
 import router from '@/router';
-import store from '@/store';
 
 export const handler = {
   errorHandling(err) {
@@ -8,13 +7,12 @@ export const handler = {
       router.push({ name: 'Login' });
     }
     if (err.response) {
-      if (err.response.status == 401) {
+      if (
+        err.response.status == 401 ||
+        err.response.data.message === 'Refresh token tidak valid.'
+      ) {
         router.push({ name: 'Login' });
       }
-      store.commit('auth/errorMessage', err.response.data.message);
-      setTimeout(() => {
-        store.commit('auth/errorMessage', null);
-      });
     }
   },
 };

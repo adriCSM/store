@@ -86,10 +86,10 @@ export const products = {
 
     async deleteProductsCart({ commit }, productId) {
       try {
-        const response = await productService.deleteProductsCart(productId);
-        commit('message', response.message);
-        const response1 = await productService.getProductsCart();
-        commit('cartProducts', response1.data.products);
+        await productService.deleteProductsCart(productId);
+        const response = await productService.getProductsCart();
+        commit('productCount', response.length);
+        commit('cart', response);
       } catch (error) {
         handler.errorHandling(error);
       }

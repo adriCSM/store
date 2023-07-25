@@ -9,7 +9,7 @@
     "
   >
     <div class="w-100 mt-5 d-flex flex-column align-center">
-      <v-row class="w-75" v-if="vuetify.display.smAndUp.value">
+      <v-row class="w-75" v-if="vuetify.display.smAndUp.value && isLogin">
         <v-spacer></v-spacer>
         <v-btn variant="text" icon="mdi-login" to="/auth/registrasi" class="text-capitalize me-5">
           Daftar
