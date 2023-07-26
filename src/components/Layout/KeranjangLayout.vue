@@ -11,11 +11,7 @@ const products = computed(() => store.state.products.cart);
 // emit and props
 const dialog = ref(false);
 const newDialog = (data) => {
-  dialog.value = data.dialog;
-  if (data.id) {
-    const product = products.value.find((product) => product.product_id._id == data.id);
-    product.count = 1;
-  }
+  dialog.value = data;
 };
 
 // checkbox
@@ -33,9 +29,15 @@ const selectAllItems = () => {
 };
 
 // plus/minus and type cuantity
-const plusMinus = async (id, event) => {
+const idUserDelete = ref();
+const productName = ref();
+const plusMinus = async (id, event, name) => {
+  if (id) {
+    idUserDelete.value = id;
+    productName.value = name;
+  }
   const product = products.value.find((product) => product.product_id._id == id);
-  event == 'plus' ? product.count++ : product.count--;
+  event == 'plus' ? product.count++ : product.count == 1 ? (dialog.value = true) : product.count--;
   if (product.count !== 0) {
     await store.dispatch('products/changeCountProduct', { id, count: product.count });
   } else {
@@ -45,9 +47,9 @@ const plusMinus = async (id, event) => {
 const type = async (id, count) => {
   if (count !== 0 && count != '') {
     await store.dispatch('products/changeCountProduct', { id, count });
+    dialog.value = false;
   } else {
     await store.dispatch('products/changeCountProduct', { id, count: 1 });
-
     dialog.value = true;
   }
 };
@@ -96,6 +98,13 @@ const angka = (event) => {
   <v-container class="pa-0">
     <v-row justify="center" class="ma-0 mb-3">
       <v-col cols="11">
+        <DialogVue
+          v-show="dialog"
+          @data="newDialog"
+          :dialog="dialog"
+          :id="idUserDelete"
+          :name="productName"
+        />
         <v-row align="center" class="bg-white">
           <v-col cols="2" v-show="!smAndUp">
             <ButtonBack />
@@ -167,12 +176,7 @@ const angka = (event) => {
                 >
                   Rp{{ product.product_id.price.toLocaleString('id-ID') }}</v-col
                 >
-                <DialogVue
-                  @data="newDialog"
-                  :dialog="dialog"
-                  :id="product.product_id._id"
-                  :name="product.product_id.name"
-                />
+
                 <v-col
                   class="d-flex flex-row me-3"
                   :class="!smAndUp ? 'ps-2' : 'pa-0'"
@@ -181,7 +185,11 @@ const angka = (event) => {
                 >
                   <button
                     style="border: 1px solid teal; height: 28px; transform: translateY(2px)"
-                    @click="product.count > 0 ? plusMinus(product.product_id._id, 'minus') : false"
+                    @click="
+                      product.count > 0
+                        ? plusMinus(product.product_id._id, 'minus', product.product_id.name)
+                        : null
+                    "
                   >
                     <v-icon color="grey">mdi-minus</v-icon>
                   </button>
@@ -203,7 +211,9 @@ const angka = (event) => {
                   <button
                     style="border: 1px solid teal; height: 28px; transform: translateY(2px)"
                     @click="
-                      product.count < stock ? plusMinus(product.product_id._id, 'plus') : false
+                      product.count < stock
+                        ? plusMinus(product.product_id._id, 'plus', product.product_id.name)
+                        : null
                     "
                   >
                     <v-icon color="grey">mdi-plus</v-icon>

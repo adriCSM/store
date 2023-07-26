@@ -25,14 +25,14 @@ const detail = (id) => {
         <CrouselLayoutVue />
       </v-col>
     </v-row>
-    <v-row justify="center">
+    <v-row justify="center" v-if="products">
       <v-col md="10">
         <v-row class="my-1">
           <v-col class="bg-white py-0"
             ><div class="text-h5 my-0 text-teal">Produk</div></v-col
           ></v-row
         >
-        <v-row dense justify="left" v-if="products">
+        <v-row dense justify="left">
           <v-col cols="6" md="2" sm="2" v-for="product in products" :key="product">
             <v-card height="230" class="pb-2" color="#FFFFFF" @click="detail(product._id)">
               <v-img :src="product.image" width="170" cover></v-img>

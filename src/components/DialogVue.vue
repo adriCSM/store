@@ -29,10 +29,8 @@ const emit = defineEmits({
 const klik = async (event) => {
   if (event == 'yes') {
     await store.dispatch('products/deleteProductsCart', props.id);
-  } else {
-    emit('data', { id: props.id });
   }
-  emit('data', { dialog: false });
+  emit('data', false);
 };
 const dialog = computed(() => props.dialog);
 </script>

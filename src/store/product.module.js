@@ -55,11 +55,10 @@ export const products = {
 
     async addToCart({ commit }, payload) {
       try {
-        const message = await productService.addToCart(payload);
+        await productService.addToCart(payload);
         const response = await productService.getProductsCart();
         commit('productCount', response.length);
         commit('cart', response);
-        store.commit('success', message);
       } catch (error) {
         handler.errorHandling(error);
       }
