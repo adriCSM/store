@@ -50,7 +50,7 @@ export default {
 
     return response.data;
   },
-  async deleteProductsCart(productId) {
+  async deleteProductCart(productId) {
     const response = await axios.delete('/store/carts/' + productId, {
       headers: await authHeader(),
     });

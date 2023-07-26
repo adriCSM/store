@@ -23,6 +23,9 @@ export const products = {
     cart(state, cart) {
       state.cart = cart;
     },
+    delete(state, id) {
+      state.cart = state.cart.filter((cart) => cart.product_id._id !== id);
+    },
   },
   actions: {
     async getProducts({ commit }) {
@@ -83,12 +86,12 @@ export const products = {
       }
     },
 
-    async deleteProductsCart({ commit }, productId) {
+    async deleteProductCart({ commit }, productId) {
       try {
-        await productService.deleteProductsCart(productId);
+        await productService.deleteProductCart(productId);
         const response = await productService.getProductsCart();
         commit('productCount', response.length);
-        commit('cart', response);
+        commit('delete', productId);
       } catch (error) {
         handler.errorHandling(error);
       }

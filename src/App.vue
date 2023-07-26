@@ -27,7 +27,6 @@ import HeaderKeranjang from '@/components/HeaderKeranjang.vue';
 }
 main {
   min-height: 100vh;
-
   background-color: #f5f5f5;
 }
 </style>

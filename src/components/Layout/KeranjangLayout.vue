@@ -10,8 +10,8 @@ const store = useStore();
 const products = computed(() => store.state.products.cart);
 // emit and props
 const dialog = ref(false);
-const newDialog = (data) => {
-  dialog.value = data;
+const newDialog = (emit) => {
+  dialog.value = emit;
 };
 
 // checkbox
@@ -44,25 +44,33 @@ const plusMinus = async (id, event, name) => {
     dialog.value = true;
   }
 };
-const type = async (id, count) => {
+const type = async (id, count, name) => {
+  if (id) {
+    idUserDelete.value = id;
+    productName.value = name;
+  }
   if (count !== 0 && count != '') {
     await store.dispatch('products/changeCountProduct', { id, count });
-    dialog.value = false;
   } else {
     await store.dispatch('products/changeCountProduct', { id, count: 1 });
+    const product = products.value.find((product) => product.product_id._id === id);
+    product.count = 1;
     dialog.value = true;
   }
 };
 
 // Delete and checkout
-const hapus = () => {
-  console.log(selected.value);
-};
-const hapusSatu = () => {
-  console.log(selected.value);
-};
 const checkout = () => {
-  console.log(products.value);
+  console.log(selected.value);
+};
+const hapusSatu = async (id) => {
+  await store.dispatch('products/deleteProductCart', id);
+};
+const hapusSemua = () => {
+  selected.value.map(async (product) => {
+    await store.dispatch('products/deleteProductCart', product.product_id._id);
+  });
+  selected.value = [];
 };
 
 // memantau perubahan
@@ -100,7 +108,7 @@ const angka = (event) => {
       <v-col cols="11">
         <DialogVue
           v-show="dialog"
-          @data="newDialog"
+          @emit="newDialog"
           :dialog="dialog"
           :id="idUserDelete"
           :name="productName"
@@ -195,7 +203,7 @@ const angka = (event) => {
                   </button>
                   <input
                     @keyup.enter="type(product.product_id._id, product.count)"
-                    @keyup="type(product.product_id._id, product.count)"
+                    @keyup="type(product.product_id._id, product.count, product.product_id.name)"
                     @keypress="angka"
                     type="text"
                     v-model="product.count"
@@ -223,7 +231,12 @@ const angka = (event) => {
                   Rp{{ (product.product_id.price * product.count).toLocaleString('id-ID') }}</v-col
                 >
                 <v-col v-show="smAndUp" sm="1" align-self="center"
-                  ><v-btn variant="text" icon="mdi-delete-outline" color="red" @click="hapusSatu">
+                  ><v-btn
+                    variant="text"
+                    icon="mdi-delete-outline"
+                    color="red"
+                    @click="hapusSatu(product.product_id._id)"
+                  >
                   </v-btn
                 ></v-col>
               </v-row>
@@ -242,7 +255,7 @@ const angka = (event) => {
             ></v-checkbox>
           </v-col>
           <v-col align-self="center ms-3" v-if="smAndUp">
-            <v-btn variant="text" @click="hapus"> hapus </v-btn>
+            <v-btn variant="text" @click="hapusSemua"> hapus </v-btn>
           </v-col>
           <v-col align-self="center" v-if="smAndUp">
             Total({{ selected.length }} Produk):

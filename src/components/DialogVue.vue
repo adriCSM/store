@@ -24,13 +24,13 @@ const props = defineProps({
   name: String,
 });
 const emit = defineEmits({
-  data: Object,
+  dialog: Boolean,
 });
 const klik = async (event) => {
   if (event == 'yes') {
-    await store.dispatch('products/deleteProductsCart', props.id);
+    await store.dispatch('products/deleteProductCart', props.id);
   }
-  emit('data', false);
+  emit('emit', false);
 };
 const dialog = computed(() => props.dialog);
 </script>
