@@ -50,5 +50,6 @@
 import vuetify from '@/plugins/vuetify';
 import router from '@/router';
 import { computed } from 'vue';
+
 const smAndUp = computed(() => (vuetify.display.smAndUp.value ? true : false));
 </script>

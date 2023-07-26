@@ -1,7 +1,6 @@
 <template>
   <v-app>
     <HeaderViewVue />
-    <HeaderKeranjang />
     <AlertWeb />
     <LoadProgres
       style="position: fixed; z-index: 9999; align-self: center; justify-self: center"
@@ -19,7 +18,6 @@
 import LoadProgres from '@/components/LoadProgres.vue';
 import AlertWeb from '@/components/AlertWeb.vue';
 import HeaderViewVue from '@/components/HeaderView.vue';
-import HeaderKeranjang from '@/components/HeaderKeranjang.vue';
 </script>
 <style>
 #app {

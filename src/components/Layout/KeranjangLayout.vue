@@ -4,6 +4,8 @@ import ButtonBack from '@/components/ButtonBack.vue';
 import DialogVue from '@/components/DialogVue.vue';
 import vuetify from '@/plugins/vuetify';
 import { useStore } from 'vuex';
+import HeaderKeranjang from '@/components/HeaderKeranjang.vue';
+
 const smAndUp = computed(() => (vuetify.display.smAndUp.value ? true : false));
 const mdAndUp = computed(() => (vuetify.display.mdAndUp.value ? true : false));
 const store = useStore();
@@ -67,10 +69,12 @@ const hapusSatu = async (id) => {
   await store.dispatch('products/deleteProductCart', id);
 };
 const hapusSemua = () => {
-  selected.value.map(async (product) => {
-    await store.dispatch('products/deleteProductCart', product.product_id._id);
-  });
-  selected.value = [];
+  if (selected.value) {
+    selected.value.map(async (product) => {
+      await store.dispatch('products/deleteProductCart', product.product_id._id);
+      selected.value = [];
+    });
+  }
 };
 
 // memantau perubahan
@@ -103,6 +107,7 @@ const angka = (event) => {
 </script>
 
 <template>
+  <HeaderKeranjang />
   <v-container class="pa-0">
     <v-row justify="center" class="ma-0 mb-3">
       <v-col cols="11">
@@ -133,7 +138,7 @@ const angka = (event) => {
           <v-col v-show="smAndUp" sm="2"> Total Harga</v-col>
           <v-col v-show="smAndUp" sm="1"> Aksi</v-col>
           <v-col cols="9 text-end" v-show="!smAndUp" sm="1">
-            <v-btn icon="mdi-delete" variant="text" color="danger"></v-btn>
+            <v-btn icon="mdi-delete" variant="text" color="danger" @click="hapusSemua"></v-btn>
           </v-col>
         </v-row>
 
