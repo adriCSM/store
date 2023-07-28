@@ -6,7 +6,7 @@ const store = useStore();
 const show = computed(() => store.state.loading);
 </script>
 <template>
-  <v-container style="height: 400px" v-show="show" class="h-100">
+  <v-container v-show="show">
     <v-row class="fill-height" align-content="center" justify="center">
       <v-col class="text-subtitle-1 text-info text-center font-weight-bold" cols="12">
         Loading...

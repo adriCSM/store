@@ -1,41 +1,39 @@
 <template>
-  <v-bottom-navigation v-model="value" active bg-color="teal" grow mode="shift">
-    <v-btn value="home" to="home">
-      <v-icon size="30">mdi-home</v-icon>
-
-      <v-tooltip activator="parent" location="top"> Home </v-tooltip>
-    </v-btn>
-
-    <v-btn value="chat" @click="snackbar = true">
-      <v-icon size="35">mdi-dropbox</v-icon>
-      <v-tooltip activator="parent" location="top"> Pesanan </v-tooltip>
-    </v-btn>
-
-    <v-btn value="akun" :to="`profile`">
-      <v-icon size="30"> mdi-account</v-icon>
-      <v-tooltip activator="parent" location="top"> Akun </v-tooltip>
-    </v-btn>
-  </v-bottom-navigation>
-
-  <v-snackbar v-model="snackbar" vertical timeout="3000">
-    <div class="text-subtitle-1 pb-2">Info</div>
-    <p>Fitur ini masih dalam tahap pengembangan</p>
-    <template v-slot:actions>
-      <v-btn color="indigo" variant="text" @click="snackbar = false"> Close </v-btn>
-    </template>
-  </v-snackbar>
+  <v-footer class="bg-teal d-flex text-center flex-column mt-0 foot">
+    <v-container class="py-5">
+      <v-row justify="space-around">
+        <v-col cols="12" md="4">
+          <v-img src="../assets/logoam2.png" width="150px"></v-img>
+          <v-btn v-for="i in icons" :key="i" :icon="i" variant="text" color="white"></v-btn>
+        </v-col>
+        <v-col class="6" md="4">
+          <p class="text-h6">Product</p>
+          <v-list class="bg-teal text-grey">
+            <v-list-item v-for="item in links" :key="item" class="py-0">
+              <router-link class="text-grey-lighten-1" :to="item.to">{{ item.name }}</router-link>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="6" md="4">
+          <p class="text-h6">tentang kami</p>
+        </v-col>
+        <v-divider :thickness="2" class="border-opacity-25" color="white"></v-divider>
+      </v-row>
+    </v-container>
+  </v-footer>
 </template>
-
-<script>
+<script setup>
 import { ref } from 'vue';
 
-export default {
-  setup() {
-    const snackbar = ref(false);
-
-    return {
-      snackbar,
-    };
-  },
-};
+const icons = ref(['mdi-facebook', 'mdi-twitter', 'mdi-linkedin', 'mdi-instagram']);
+const links = ref([
+  { to: '/', name: 'Makanan' },
+  { to: '/', name: 'Pakaian' },
+  { to: '/', name: 'Skincare' },
+]);
 </script>
+<style>
+a:hover {
+  color: #000000;
+}
+</style>
