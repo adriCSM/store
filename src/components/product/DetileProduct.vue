@@ -7,10 +7,9 @@ import { useStore } from 'vuex';
 import vuetify from '@/plugins/vuetify';
 
 const mdUp = computed(() => vuetify.display.mdAndUp.value);
-const rating = ref(4.5);
 const count = ref(1);
 
-const stock = computed(() => parseInt(store.state.products.product.cuantity));
+const stock = computed(() => parseInt(store.state.products.product.quantity));
 const route = useRoute();
 const store = useStore();
 const id = route.params.id;
@@ -18,6 +17,7 @@ const errorInput = ref(false);
 
 onMounted(async () => {
   await store.dispatch('products/getProduct', id);
+  console.log(store.state.products.product);
 });
 const product = computed(() => store.state.products.product);
 
@@ -44,6 +44,13 @@ const angka1 = () => {
 const keranjang = async () => {
   await store.dispatch('products/addToCart', { productId: id, count: count.value });
 };
+const star = computed(() => {
+  if (product.value.evaluation !== 0 && product.value.rating !== 0) {
+    return product.value.evaluation / product.value.rating;
+  } else {
+    return 0;
+  }
+});
 </script>
 <template>
   <v-container v-if="product" :class="mdUp ? 'mt-5' : 'mt-0'">
@@ -63,7 +70,7 @@ const keranjang = async () => {
               </div>
               <div>
                 <v-btn icon="mdi-heart-outline" color="pink" variant="text"></v-btn>
-                Faforit (34)
+                Faforit ({{ product.favorite }})
               </div>
             </div>
           </v-col>
@@ -75,9 +82,9 @@ const keranjang = async () => {
             <div class="text-h4 font-weight-bold text-teal">
               Rp{{ product.price.toLocaleString('id-ID') }}
             </div>
-            <span class="text-teal text-caption me-2"> ({{ rating }}) </span>
+            <span class="text-teal text-caption me-2"> ({{ star }}) </span>
             <v-rating
-              v-model="rating"
+              :v-model="star"
               color="teal"
               active-color="teal"
               half-increments
@@ -87,9 +94,9 @@ const keranjang = async () => {
             >
             </v-rating>
             <span class="mx-3"> | </span>
-            <span>134 Penilaian</span>
+            <span>{{ product.evaluation }} Penilaian</span>
             <span class="mx-3"> | </span>
-            <span>123 Terjual</span>
+            <span>{{ product.sold_out }} Terjual</span>
 
             <div class="pt-10">
               <div class="text-title">Deskripsi Produk:</div>
