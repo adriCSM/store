@@ -42,12 +42,7 @@ const login = async () => {
       <v-col align-self="center" cols="12 " class="d-flex justify-center">
         <v-card class="pa-3 overflow-visible" elevation="20" min-width="300" rounded="lg">
           <v-card class="bg-teal mt-0 rounded-lg align-end" style="top: -40px" elevation="5">
-            <v-img
-              class="mx-auto my-8"
-              max-width="120"
-              max-height="70px"
-              src="../../assets/logoam2.png"
-            >
+            <v-img class="mx-auto my-8" width="180" max-height="70px" src="../../assets/am.png">
             </v-img>
           </v-card>
 

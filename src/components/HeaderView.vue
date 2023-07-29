@@ -22,7 +22,7 @@
       <v-row class="w-100 ma-0" justify="center">
         <v-col cols="auto" v-if="vuetify.display.smAndUp.value">
           <router-link to="/home">
-            <v-img src="../assets/logoam2.png" width="100" />
+            <v-img src="../assets/am.png" width="180" />
           </router-link>
         </v-col>
         <v-col md="7 pe-0">

@@ -11,7 +11,7 @@
           <v-row justify="center">
             <v-col cols="auto" v-show="smAndUp" align-self="center">
               <router-link to="/home">
-                <v-img src="../assets/logoam2.png" width="100" />
+                <v-img src="../assets/amTeal.png" width="180" />
               </router-link>
             </v-col>
             <v-divider vertical></v-divider>
