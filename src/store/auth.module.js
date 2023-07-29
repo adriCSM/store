@@ -34,10 +34,7 @@ export const auth = {
       try {
         await AuthService.logout();
         context.commit('isLoggedIn', false);
-        context.commit('username', context.state.username);
-        setTimeout(() => {
-          context.commit('username', null);
-        }, 1000);
+        router.push({ name: 'Login' });
       } catch (error) {
         context.commit('isLoggedIn', true);
         handler.errorHandling(error);

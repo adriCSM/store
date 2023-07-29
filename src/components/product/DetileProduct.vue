@@ -17,7 +17,6 @@ const errorInput = ref(false);
 
 onMounted(async () => {
   await store.dispatch('products/getProduct', id);
-  console.log(store.state.products.product);
 });
 const product = computed(() => store.state.products.product);
 

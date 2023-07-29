@@ -11,8 +11,8 @@ export default {
   },
 
   async searchProduct(query) {
-    const response = await axios.get(`/products/?productName=${query}`);
-    return response.data;
+    const response = await axios.get(`/store/products/search?productName=${query}`);
+    return response.data.data.products;
   },
 
   async addToCart(payload) {

@@ -2,7 +2,13 @@ import productService from '../services/product.service';
 import { handler } from '../services/error-handler';
 import store from '@/store';
 
-const initialState = { data: null, product: null, cart: null, productCount: null };
+const initialState = {
+  data: null,
+  product: null,
+  cart: null,
+  productCount: null,
+  listProductsName: [],
+};
 
 export const products = {
   namespaced: true,
@@ -11,11 +17,15 @@ export const products = {
     data(state, data) {
       state.data = data;
     },
+    lists(state, lists) {
+      let names = [];
+      lists.map((product) => {
+        names.push(product.name);
+      });
+      state.listProductsName = names;
+    },
     product(state, product) {
       state.product = product;
-    },
-    message(state, message) {
-      state.message = message;
     },
     productCount(state, productCount) {
       state.productCount = productCount;
@@ -50,7 +60,7 @@ export const products = {
     async searchProduct({ commit }, query) {
       try {
         const response = await productService.searchProduct(query);
-        commit('successGet', response.data.products);
+        commit('lists', response);
       } catch (error) {
         handler.errorHandling(error);
       }

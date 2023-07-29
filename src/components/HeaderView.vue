@@ -26,25 +26,39 @@
           </router-link>
         </v-col>
         <v-col md="7 pe-0">
-          <v-text-field
-            @keyup.prevent="searchProduct"
-            v-model="query"
+          <v-autocomplete
+            @keyup="search"
+            :v-model="query"
             class="flex-full-width"
-            density="comfortable"
             placeholder="Search "
             prepend-inner-icon="mdi-magnify"
             theme="light"
             variant="solo"
-          ></v-text-field>
+            :items="names"
+          ></v-autocomplete>
         </v-col>
         <v-col cols="auto" class="px-0">
           <v-btn @click="keranjang" icon to="/keranjang">
             <v-badge v-if="count" :content="count" color="error">
               <v-icon size="25">mdi-cart-outline</v-icon>
             </v-badge>
-
             <v-icon v-else size="25">mdi-cart-outline</v-icon>
           </v-btn>
+        </v-col>
+        <v-col cols="auto" v-if="vuetify.display.smAndUp.value && isLogin && profile">
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-avatar :image="profile.pic" v-bind="props" style="cursor: pointer"> </v-avatar>
+            </template>
+
+            <v-list>
+              <v-list-item v-for="(item, i) in menu" :key="i" @click="item.method">
+                <v-list-item-title>
+                  <v-icon>{{ item.icon }}</v-icon> {{ item.title }}
+                </v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-col>
       </v-row>
     </div>
@@ -53,17 +67,44 @@
 <script setup>
 import vuetify from '@/plugins/vuetify';
 import router from '@/router';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+
 const store = useStore();
 const isLogin = computed(() => store.state.auth.loggedIn);
-if (isLogin.value && !store.state.products.productCount) {
+const names = ref(['d']);
+const query = ref(null);
+if (isLogin.value && !store.state.products.productCount && !store.state.profile.userProfile) {
   onMounted(async () => {
     await store.dispatch('products/getProductsCart');
+    await store.dispatch('profile/getProfile');
   });
 }
 const keranjang = async () => {
   await store.dispatch('products/getProductsCart');
 };
+
+const search = async () => {
+  console.log(query.value);
+  // await store.dispatch('products/searchProduct', query);
+  // console.log(store.state.products.listProductsName);
+};
 const count = computed(() => store.state.products.productCount);
+const profile = computed(() => store.state.profile.userProfile);
+const menu = ref([
+  {
+    title: 'Profile',
+    method: () => {
+      router.push({ name: 'Profile' });
+    },
+    icon: 'mdi-account',
+  },
+  {
+    title: 'Log Out',
+    method: async () => {
+      await store.dispatch('auth/logout');
+    },
+    icon: 'mdi-logout',
+  },
+]);
 </script>

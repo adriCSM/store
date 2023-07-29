@@ -11,6 +11,12 @@ if (!store.state.products.data) {
     await store.dispatch('products/getProducts');
   });
 }
+if (!store.state.profile.userProfile) {
+  onMounted(async () => {
+    await store.dispatch('profile/getProfile');
+  });
+}
+
 const products = computed(() => store.state.products.data);
 
 const detail = (id) => {

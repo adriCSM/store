@@ -13,7 +13,7 @@ export const profile = {
         const token = JSON.parse(localStorage.getItem('user_id'));
         const { id: userId } = jwtDecode(token);
         const userProfile = await ProfileService.getProfile(userId);
-        commit('success', userProfile);
+        commit('profile', userProfile);
       } catch (error) {
         handler.errorHandling(error);
       }
@@ -30,8 +30,8 @@ export const profile = {
     // },
   },
   mutations: {
-    success(state, userProfile) {
-      state.userProfile = userProfile;
+    profile(state, profile) {
+      state.userProfile = profile;
     },
     successUpload(state, picURL) {
       state.userProfile.profile_image = picURL;
