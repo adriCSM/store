@@ -7,8 +7,9 @@
       router.currentRoute.value.name !== 'Register' &&
       router.currentRoute.value.name !== 'Keranjang'
     "
+    style="max-width: 100vw"
   >
-    <div class="w-100 mt-5 d-flex flex-column align-center">
+    <div class="w-100 d-flex flex-column align-center">
       <v-row class="w-75" v-if="vuetify.display.smAndUp.value && !isLogin">
         <v-spacer></v-spacer>
         <v-btn variant="text" icon="mdi-login" to="/auth/registrasi" class="text-capitalize me-5">
@@ -20,14 +21,14 @@
         </v-btn>
       </v-row>
       <v-row class="w-100 ma-0" justify="center">
-        <v-col cols="auto" v-if="vuetify.display.smAndUp.value">
+        <v-col cols="auto" v-if="vuetify.display.smAndUp.value" align-self="center">
           <router-link to="/home">
             <v-img src="../assets/am.png" width="180" />
           </router-link>
         </v-col>
-        <v-col md="7 pe-0">
-          <v-autocomplete
-            @keyup="search"
+        <v-col md="7 pe-0" class="mt-5">
+          <v-text-field
+            @keyup="search(query)"
             :v-model="query"
             class="flex-full-width"
             placeholder="Search "
@@ -35,9 +36,9 @@
             theme="light"
             variant="solo"
             :items="names"
-          ></v-autocomplete>
+          ></v-text-field>
         </v-col>
-        <v-col cols="auto" class="px-0">
+        <v-col cols="auto" class="px-0" align-self="center">
           <v-btn @click="keranjang" icon to="/keranjang">
             <v-badge v-if="count" :content="count" color="error">
               <v-icon size="25">mdi-cart-outline</v-icon>
@@ -45,7 +46,7 @@
             <v-icon v-else size="25">mdi-cart-outline</v-icon>
           </v-btn>
         </v-col>
-        <v-col cols="auto" v-if="vuetify.display.smAndUp.value && isLogin && profile">
+        <v-col cols="auto" v-if="isLogin && profile" align-self="center">
           <v-menu>
             <template v-slot:activator="{ props }">
               <v-avatar :image="profile.pic" v-bind="props" style="cursor: pointer"> </v-avatar>
@@ -73,7 +74,6 @@ import { useStore } from 'vuex';
 const store = useStore();
 const isLogin = computed(() => store.state.auth.loggedIn);
 const names = ref(['d']);
-const query = ref(null);
 if (isLogin.value && !store.state.products.productCount && !store.state.profile.userProfile) {
   onMounted(async () => {
     await store.dispatch('products/getProductsCart');
@@ -84,8 +84,8 @@ const keranjang = async () => {
   await store.dispatch('products/getProductsCart');
 };
 
-const search = async () => {
-  console.log(query.value);
+const search = async (query) => {
+  console.log(query);
   // await store.dispatch('products/searchProduct', query);
   // console.log(store.state.products.listProductsName);
 };

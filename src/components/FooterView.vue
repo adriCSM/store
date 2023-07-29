@@ -28,6 +28,9 @@
           </v-list>
         </v-col>
         <v-divider :thickness="2" class="border-opacity-25" color="white"></v-divider>
+        <v-col class="text-start pt-0">
+          Copyright &copy; {{ new Date().getFullYear() }} by Adri Candra Saputra Mangidi
+        </v-col>
       </v-row>
     </v-container>
   </v-footer>

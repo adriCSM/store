@@ -119,7 +119,7 @@ const angka = (event) => {
           :name="productName"
         />
         <v-row align="center" class="bg-white">
-          <v-col cols="2" v-show="!smAndUp">
+          <v-col cols="12" v-show="!smAndUp">
             <ButtonBack />
           </v-col>
           <v-col cols="1"
@@ -137,7 +137,7 @@ const angka = (event) => {
           <v-col v-show="smAndUp">Kuantitas</v-col>
           <v-col v-show="smAndUp" sm="2"> Total Harga</v-col>
           <v-col v-show="smAndUp" sm="1"> Aksi</v-col>
-          <v-col cols="9 text-end" v-show="!smAndUp" sm="1">
+          <v-col cols="11 text-end" v-show="!smAndUp" sm="1">
             <v-btn icon="mdi-delete" variant="text" color="danger" @click="hapusSemua"></v-btn>
           </v-col>
         </v-row>
