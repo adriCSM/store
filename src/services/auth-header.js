@@ -7,7 +7,7 @@ export default async function authHeader() {
     return {
       Authorization: 'Bearer ' + user,
       Accept: 'application/vnd.api+json',
-      'Content-Type': 'application/vnd.api+json',
+      'Content-Type': ['application/vnd.api+json', 'multipart/form-data'],
     };
   } else {
     return {};

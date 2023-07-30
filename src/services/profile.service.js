@@ -10,10 +10,9 @@ export default {
     return response.data.data;
   },
 
-  async editProfile(userId, payload) {
-    console.log({ userId, payload });
+  async editProfile(payload) {
     const response = await axios.put(
-      '/users/' + userId,
+      '/users',
       {
         ...payload,
       },
@@ -21,7 +20,6 @@ export default {
         headers: await authHeader(),
       },
     );
-    console.log(response);
 
     return response.data;
   },

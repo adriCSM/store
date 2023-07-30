@@ -3,6 +3,7 @@ import AuthService from '../services/auth.service';
 import ProfileService from '@/services/profile.service';
 import { handler } from '../services/error-handler';
 import router from '@/router';
+import store from '@/store';
 
 const user = JSON.parse(localStorage.getItem('user'));
 const initialState = user ? { loggedIn: true } : { loggedIn: false };
@@ -42,14 +43,9 @@ export const auth = {
     },
     async register({ commit }, user) {
       try {
-        const response = await AuthService.register(user);
+        const message = await AuthService.register(user);
         commit('isLoggedIn', true);
-        if (response) {
-          commit('successMessage', response.message);
-          setTimeout(() => {
-            commit('successMessage', null);
-          }, 1000);
-        }
+        store.commit('success', message);
       } catch (error) {
         commit('isLoggedIn', false);
         handler.errorHandling(error);

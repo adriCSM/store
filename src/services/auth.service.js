@@ -45,7 +45,7 @@ export default {
       password: user.password,
       confirmPassword: user.confirmPassword,
     });
-    return response.data;
+    return response.data.message;
   },
 
   async passwordForgot(userEmail) {

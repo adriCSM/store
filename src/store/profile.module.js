@@ -1,4 +1,6 @@
+import router from '@/router';
 import ProfileService from '@/services/profile.service';
+import store from '@/store';
 import jwtDecode from 'jwt-decode';
 
 const initialState = { userProfile: null };
@@ -20,10 +22,15 @@ export const profile = {
     },
 
     async editProfile({ commit }, payload) {
-      const token = JSON.parse(localStorage.getItem('user_id'));
-      const { id: userId } = jwtDecode(token);
-      const userProfile = await ProfileService.editProfile(userId, payload);
-      commit('success', userProfile);
+      try {
+        const response = await ProfileService.editProfile(payload);
+        const userProfile = await ProfileService.getProfile(response.id);
+        commit('profile', userProfile);
+        store.commit('success', response.message);
+        router.push({ name: 'Profile' });
+      } catch (error) {
+        handler.errorHandling(error);
+      }
     },
 
     // async uploadPic({ commit }, file) {

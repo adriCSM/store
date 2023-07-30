@@ -21,7 +21,7 @@
             </v-row>
             <v-divider> </v-divider>
             <v-row>
-              <v-col cols="12" md="7">
+              <v-col cols="12" md="7" order="1" order-md="0">
                 <v-row>
                   <v-col>username</v-col>
                   <v-col>{{ profile.username }}</v-col>
@@ -41,13 +41,13 @@
                 </v-row>
                 <v-row>
                   <v-col>jenis kelamin</v-col>
-                  <v-col v-if="profile.jenis_kelamin">{{ profile.jenis_kelamin }}</v-col>
-                  <v-col>-</v-col>
+                  <v-col v-if="profile.gender">{{ profile.gender }}</v-col>
+                  <v-col v-else>-</v-col>
                 </v-row>
                 <v-row>
                   <v-col>tanggal lahir</v-col>
-                  <v-col v-if="profile.tanggal_lahir">{{ profile.tanggal_lahir }}</v-col>
-                  <v-col>-</v-col>
+                  <v-col v-if="profile.birth">{{ profile.birth }}</v-col>
+                  <v-col v-else>-</v-col>
                 </v-row>
               </v-col>
               <v-col class="text-center">

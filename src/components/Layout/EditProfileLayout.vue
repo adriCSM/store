@@ -4,9 +4,10 @@ import ButtonBack from '@/components/ButtonBack.vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const date = ref(null);
-const mount = ref(null);
-const year = ref(null);
+
+const date = ref();
+const mount = ref();
+const years = ref();
 
 const tanggal = ref([]);
 const bulan = ref([]);
@@ -17,8 +18,7 @@ const inputan = ref({
   email: '',
   phone_number: '',
   gender: null,
-  birth: date.value + ' ' + mount.value + ' ' + year.value,
-  pic: '',
+  pic: [],
   blob: '',
 });
 const user = computed(() => store.state.profile.userProfile);
@@ -35,9 +35,14 @@ onMounted(async () => {
       email: user.value.email,
       phone_number: user.value.phone_number,
       gender: user.value.gender,
-      birth: user.value.birth,
+      pic: [new File([user.value.pic], 'default profile', { type: 'image/png' })],
       blob: user.value.pic,
     };
+    if (store.state.profile.userProfile.birth) {
+      date.value = user.value.birth.split(' ')[0];
+      mount.value = user.value.birth.split(' ')[1];
+      years.value = user.value.birth.split(' ')[2];
+    }
   }
   const year = new Date().getFullYear() + 1;
   for (let i = 1; i <= 100; i++) {
@@ -57,18 +62,6 @@ if (!store.state.profile.userProfile) {
   });
 }
 
-const simpan = async () => {
-  await store.dispatch('profile/editProfile', {
-    name: inputan.value.name,
-    username: inputan.value.username,
-    email: inputan.value.email,
-    phone_number: inputan.value.phone_number,
-    gender: inputan.value.gender,
-    birth: inputan.value.birth,
-    image: inputan.value.pic,
-  });
-};
-
 const uploader = ref();
 const handleImportFile = () => {
   uploader.value.click();
@@ -78,6 +71,17 @@ const onFileChanged = (event) => {
   const blob = URL.createObjectURL(file);
   inputan.value.pic = event.target.files;
   inputan.value.blob = blob;
+};
+const simpan = async () => {
+  await store.dispatch('profile/editProfile', {
+    name: inputan.value.name,
+    username: inputan.value.username,
+    email: inputan.value.email,
+    phoneNumber: inputan.value.phone_number,
+    gender: inputan.value.gender,
+    birth: date.value + ' ' + mount.value + ' ' + years.value,
+    image: inputan.value.pic[0],
+  });
 };
 </script>
 
@@ -91,15 +95,17 @@ const onFileChanged = (event) => {
         </v-row>
         <v-divider></v-divider>
         <v-row justify="center">
-          <v-col class="text-h5 text-end" cols="auto">
-            <v-img :src="inputan.blob" height="200" width="200">
-              <v-btn
-                icon="mdi-pencil"
-                color="teal"
-                @click="handleImportFile"
-                style="transform: translateY(140px)"
-              ></v-btn>
-            </v-img>
+          <v-col class="text-h5" cols="auto">
+            <v-avatar :image="inputan.blob" size="200"> </v-avatar>
+          </v-col>
+          <v-col class="text-h5" cols="auto">
+            <v-btn
+              icon="mdi-pencil"
+              position="absolute"
+              color="teal"
+              @click="handleImportFile"
+              style="transform: translate(-100px, 160px)"
+            ></v-btn>
 
             <input ref="uploader" class="d-none" type="file" @change="onFileChanged" />
           </v-col>
@@ -177,7 +183,7 @@ const onFileChanged = (event) => {
             </v-select>
           </v-col>
           <v-col cols="3">
-            <v-select variant="outlined" :items="tahun" color="teal" v-model="year"> </v-select>
+            <v-select variant="outlined" :items="tahun" color="teal" v-model="years"> </v-select>
           </v-col>
         </v-row>
         <v-row>
