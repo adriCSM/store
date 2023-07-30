@@ -19,10 +19,12 @@ export const profile = {
       }
     },
 
-    // async editProfile({ commit }, modifiedProfile) {
-    //   const userProfile = await ProfileService.editProfile(modifiedProfile);
-    //   commit('success', userProfile);
-    // },
+    async editProfile({ commit }, payload) {
+      const token = JSON.parse(localStorage.getItem('user_id'));
+      const { id: userId } = jwtDecode(token);
+      const userProfile = await ProfileService.editProfile(userId, payload);
+      commit('success', userProfile);
+    },
 
     // async uploadPic({ commit }, file) {
     //   const picURL = (await ProfileService.uploadPic(file, this.state.profile.userProfile.id)).url;

@@ -8,7 +8,7 @@
     <v-container class="py-5">
       <v-row justify="space-around">
         <v-col cols="12" md="4">
-          <v-img src="../assets/am.png" width="150px"></v-img>
+          <v-img src="../assets/am.png" width="150px" @click="push" style="cursor: pointer"></v-img>
           <v-btn v-for="i in icons" :key="i" :icon="i" variant="text" color="white"></v-btn>
         </v-col>
         <v-col class="6" md="4">
@@ -50,6 +50,10 @@ const linksb = ref([
   { to: '/', name: 'Kebijakan Pribadi' },
   { to: '/', name: 'Hubungi Kami' },
 ]);
+
+const push = () => {
+  router.push({ name: 'Home' });
+};
 </script>
 <style>
 a:hover {
